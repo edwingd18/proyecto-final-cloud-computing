@@ -33,7 +33,7 @@ pipeline {
                             echo '📦 Instalando dependencias - Servicio Activos'
                         }
                         dir('servicio-activos') {
-                            sh 'npm ci'
+                            sh 'npm install'
                         }
                     }
                 }
@@ -43,7 +43,7 @@ pipeline {
                             echo '📦 Instalando dependencias - Servicio Mantenimientos'
                         }
                         dir('servicio-mantenimientos') {
-                            sh 'npm ci'
+                            sh 'npm install'
                         }
                     }
                 }
@@ -53,7 +53,7 @@ pipeline {
                             echo '📦 Instalando dependencias - API Gateway'
                         }
                         dir('api-gateway') {
-                            sh 'npm ci'
+                            sh 'npm install'
                         }
                     }
                 }
@@ -63,7 +63,7 @@ pipeline {
                             echo '📦 Instalando dependencias - Frontend'
                         }
                         dir('frontend') {
-                            sh 'npm ci'
+                            sh 'npm install'
                         }
                     }
                 }
