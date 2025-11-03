@@ -1,6 +1,9 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS 20'  
+    }
     environment {
         // Variables de entorno
         DOCKER_REGISTRY = 'docker.io'
