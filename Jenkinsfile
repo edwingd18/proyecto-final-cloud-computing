@@ -6,7 +6,7 @@ pipeline {
         DOCKER_REGISTRY = 'docker.io'
         PROJECT_NAME = 'sistema-gestion-activos'
         GIT_CREDENTIALS = 'github-credentials'
-        RENDER_REPO_URL = credentials('render-git-url')
+        // RENDER_REPO_URL = credentials('render-git-url') // Comentado hasta configurar Render
     }
 
     stages {
