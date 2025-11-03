@@ -119,6 +119,8 @@ pipeline {
             }
         }
 
+        // TEMPORALMENTE COMENTADO - Descomentar después de configurar Render
+        /*
         stage('Deploy to Render') {
             when {
                 branch 'main'
@@ -155,6 +157,7 @@ pipeline {
                 }
             }
         }
+        */
     }
 
     post {
@@ -187,11 +190,16 @@ pipeline {
         }
 
         always {
-            // Limpiar workspace
-            cleanWs(
-                deleteDirs: true,
-                patterns: [[pattern: 'node_modules/**', type: 'INCLUDE']]
-            )
+            script {
+                echo '========================================='
+                echo '  Pipeline finalizado'
+                echo '========================================='
+            }
+            // Nota: cleanWs comentado temporalmente para evitar errores
+            // cleanWs(
+            //     deleteDirs: true,
+            //     patterns: [[pattern: 'node_modules/**', type: 'INCLUDE']]
+            // )
         }
     }
 }
