@@ -139,6 +139,30 @@ services:
       - microservices-network
     restart: unless-stopped
 
+  # Jenkins para CI/CD
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: jenkins
+    user: root
+    environment:
+      - JENKINS_OPTS=--prefix=/jenkins
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - microservices-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/jenkins/login || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
 networks:
   microservices-network:
     driver: bridge
@@ -149,3 +173,5 @@ volumes:
     name: postgres-activos-data
   mongodb_data:
     name: mongodb-mantenimientos-data
+  jenkins_home:
+    name: jenkins-home-data

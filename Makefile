@@ -24,10 +24,11 @@ up: ## Levantar todos los servicios
 	@echo "$(GREEN)Iniciando servicios...$(NC)"
 	docker-compose up -d
 	@echo "$(GREEN)Servicios iniciados:$(NC)"
-	@echo "  - API Gateway:          http://localhost:3000"
-	@echo "  - Servicio Activos:     http://localhost:3001"
+	@echo "  - API Gateway:             http://localhost:3000"
+	@echo "  - Servicio Activos:        http://localhost:3001"
 	@echo "  - Servicio Mantenimientos: http://localhost:3002"
-	@echo "  - Frontend:             http://localhost:3003"
+	@echo "  - Frontend:                http://localhost:3003"
+	@echo "  - Jenkins:                 http://localhost:8080/jenkins"
 
 down: ## Detener todos los servicios
 	@echo "$(YELLOW)Deteniendo servicios...$(NC)"
@@ -89,3 +90,22 @@ shell-postgres: ## Abrir shell en PostgreSQL
 
 shell-mongo: ## Abrir shell en MongoDB
 	docker-compose exec mongodb mongosh mantenimientos_db
+
+jenkins-start: ## Iniciar Jenkins
+	@echo "$(GREEN)Iniciando Jenkins...$(NC)"
+	docker-compose up -d jenkins
+	@echo "$(GREEN)Jenkins iniciado en: http://localhost:8080/jenkins$(NC)"
+
+jenkins-password: ## Obtener contraseña inicial de Jenkins
+	@echo "$(GREEN)Contraseña inicial de Jenkins:$(NC)"
+	@docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+jenkins-logs: ## Ver logs de Jenkins
+	docker-compose logs -f jenkins
+
+jenkins-restart: ## Reiniciar Jenkins
+	@echo "$(YELLOW)Reiniciando Jenkins...$(NC)"
+	docker-compose restart jenkins
+
+jenkins-shell: ## Abrir shell en Jenkins
+	docker exec -it jenkins bash

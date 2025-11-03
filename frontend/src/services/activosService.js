@@ -12,7 +12,7 @@ export const activosService = {
   // Obtener un activo por ID
   getById: async (id) => {
     const response = await api.get(`${ACTIVOS_ENDPOINT}/${id}`);
-    return response.data;
+    return response.data.data; // Extraer el objeto del wrapper
   },
 
   // Crear un nuevo activo

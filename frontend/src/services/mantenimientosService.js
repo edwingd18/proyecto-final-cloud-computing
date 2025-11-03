@@ -12,13 +12,13 @@ export const mantenimientosService = {
   // Obtener un mantenimiento por ID
   getById: async (id) => {
     const response = await api.get(`${MANTENIMIENTOS_ENDPOINT}/${id}`);
-    return response.data;
+    return response.data.data; // Extraer el objeto del wrapper
   },
 
   // Obtener mantenimientos por activo
   getByActivo: async (activoId) => {
     const response = await api.get(`${MANTENIMIENTOS_ENDPOINT}/activo/${activoId}`);
-    return response.data;
+    return response.data.data; // Extraer el array del wrapper
   },
 
   // Crear un nuevo mantenimiento

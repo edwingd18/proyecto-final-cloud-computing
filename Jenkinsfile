@@ -1,0 +1,197 @@
+pipeline {
+    agent any
+
+    environment {
+        // Variables de entorno
+        DOCKER_REGISTRY = 'docker.io'
+        PROJECT_NAME = 'sistema-gestion-activos'
+        GIT_CREDENTIALS = 'github-credentials'
+        RENDER_REPO_URL = credentials('render-git-url')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo '========================================='
+                    echo '  🔍 CHECKOUT: Obteniendo código fuente'
+                    echo '========================================='
+                }
+                checkout scm
+                sh 'git log -1'
+            }
+        }
+
+        stage('Install Dependencies') {
+            parallel {
+                stage('Install Activos') {
+                    steps {
+                        script {
+                            echo '📦 Instalando dependencias - Servicio Activos'
+                        }
+                        dir('servicio-activos') {
+                            sh 'npm ci'
+                        }
+                    }
+                }
+                stage('Install Mantenimientos') {
+                    steps {
+                        script {
+                            echo '📦 Instalando dependencias - Servicio Mantenimientos'
+                        }
+                        dir('servicio-mantenimientos') {
+                            sh 'npm ci'
+                        }
+                    }
+                }
+                stage('Install API Gateway') {
+                    steps {
+                        script {
+                            echo '📦 Instalando dependencias - API Gateway'
+                        }
+                        dir('api-gateway') {
+                            sh 'npm ci'
+                        }
+                    }
+                }
+                stage('Install Frontend') {
+                    steps {
+                        script {
+                            echo '📦 Instalando dependencias - Frontend'
+                        }
+                        dir('frontend') {
+                            sh 'npm ci'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            parallel {
+                stage('Test Activos') {
+                    steps {
+                        script {
+                            echo '🧪 Ejecutando tests - Servicio Activos'
+                        }
+                        dir('servicio-activos') {
+                            sh 'npm test'
+                        }
+                    }
+                    post {
+                        always {
+                            junit(testResults: 'servicio-activos/junit.xml', allowEmptyResults: true)
+                        }
+                    }
+                }
+                stage('Test Mantenimientos') {
+                    steps {
+                        script {
+                            echo '🧪 Ejecutando tests - Servicio Mantenimientos'
+                        }
+                        dir('servicio-mantenimientos') {
+                            sh 'npm test'
+                        }
+                    }
+                    post {
+                        always {
+                            junit(testResults: 'servicio-mantenimientos/junit.xml', allowEmptyResults: true)
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    echo '========================================='
+                    echo '  🐳 BUILD: Construyendo imágenes Docker'
+                    echo '========================================='
+                }
+                sh '''
+                    docker-compose build --no-cache
+                    docker images | grep proyecto-fina-cloud-computing
+                '''
+            }
+        }
+
+        stage('Deploy to Render') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    echo '========================================='
+                    echo '  🚀 DEPLOY: Desplegando a Render'
+                    echo '========================================='
+
+                    // Opción 1: Push a repositorio que Render monitorea
+                    withCredentials([usernamePassword(
+                        credentialsId: env.GIT_CREDENTIALS,
+                        usernameVariable: 'GIT_USERNAME',
+                        passwordVariable: 'GIT_PASSWORD'
+                    )]) {
+                        sh '''
+                            # Configurar Git
+                            git config user.name "Jenkins CI"
+                            git config user.email "jenkins@ci.local"
+
+                            # Agregar remote de Render si no existe
+                            if ! git remote | grep -q render; then
+                                git remote add render ${RENDER_REPO_URL}
+                            fi
+
+                            # Push a Render (esto triggerea el deployment automático)
+                            git push render HEAD:main --force || echo "Push to Render completed"
+                        '''
+                    }
+
+                    echo '✅ Código pusheado a Render. Deployment automático iniciado.'
+                    echo '📊 Verifica el progreso en: https://dashboard.render.com/'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                echo '========================================='
+                echo '  ✅ BUILD EXITOSO'
+                echo '========================================='
+                echo "Commit: ${env.GIT_COMMIT}"
+                echo "Branch: ${env.GIT_BRANCH}"
+                echo "Build: #${env.BUILD_NUMBER}"
+            }
+
+            // Notificación de éxito (puedes agregar Slack, email, etc.)
+            // slackSend(color: 'good', message: "Build #${env.BUILD_NUMBER} exitoso")
+        }
+
+        failure {
+            script {
+                echo '========================================='
+                echo '  ❌ BUILD FALLIDO'
+                echo '========================================='
+                echo "Commit: ${env.GIT_COMMIT}"
+                echo "Branch: ${env.GIT_BRANCH}"
+                echo "Build: #${env.BUILD_NUMBER}"
+            }
+
+            // Notificación de fallo
+            // slackSend(color: 'danger', message: "Build #${env.BUILD_NUMBER} falló")
+        }
+
+        always {
+            // Limpiar workspace
+            cleanWs(
+                deleteDirs: true,
+                patterns: [[pattern: 'node_modules/**', type: 'INCLUDE']]
+            )
+        }
+    }
+}

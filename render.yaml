@@ -1,0 +1,134 @@
+# Render Blueprint - Sistema de Gestión de Activos y Mantenimientos
+# https://render.com/docs/blueprint-spec
+
+services:
+  # ============================================
+  # API Gateway - Web Service (Público)
+  # ============================================
+  - type: web
+    name: api-gateway
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd api-gateway && npm install
+    startCommand: cd api-gateway && npm start
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      - key: ACTIVOS_SERVICE_URL
+        fromService:
+          type: pserv
+          name: servicio-activos
+          property: hostport
+      - key: MANTENIMIENTOS_SERVICE_URL
+        fromService:
+          type: pserv
+          name: servicio-mantenimientos
+          property: hostport
+    healthCheckPath: /health
+
+  # ============================================
+  # Servicio de Activos - Private Service
+  # ============================================
+  - type: pserv
+    name: servicio-activos
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd servicio-activos && npm install
+    startCommand: cd servicio-activos && npm start
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        fromDatabase:
+          name: postgres-activos
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: postgres-activos
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: postgres-activos
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: postgres-activos
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: postgres-activos
+          property: password
+    healthCheckPath: /health
+
+  # ============================================
+  # Servicio de Mantenimientos - Private Service
+  # ============================================
+  - type: pserv
+    name: servicio-mantenimientos
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd servicio-mantenimientos && npm install
+    startCommand: cd servicio-mantenimientos && npm start
+    envVars:
+      - key: PORT
+        value: 3002
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+        # IMPORTANTE: Debes crear un cluster GRATUITO en MongoDB Atlas
+        # y configurar esta variable en Render Dashboard
+        # Ejemplo: mongodb+srv://user:password@cluster.mongodb.net/mantenimientos_db
+    healthCheckPath: /health
+
+  # ============================================
+  # Frontend - Web Service (Estático)
+  # ============================================
+  - type: web
+    name: frontend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: api-gateway
+          envVarKey: RENDER_EXTERNAL_URL
+    healthCheckPath: /
+
+# ============================================
+# Databases
+# ============================================
+databases:
+  # PostgreSQL para Servicio de Activos
+  - name: postgres-activos
+    databaseName: activos_db
+    user: postgres
+    plan: free
+    region: oregon
+    ipAllowList: []  # Permite conexiones desde cualquier servicio de Render
+
+# NOTA: Para MongoDB, se recomienda usar MongoDB Atlas (gratis)
+# en lugar de una base de datos en Render, ya que Render no
+# ofrece MongoDB nativo en su free tier.
+#
+# Pasos para configurar MongoDB Atlas:
+# 1. Crear cuenta en https://www.mongodb.com/cloud/atlas
+# 2. Crear un cluster FREE (M0)
+# 3. Configurar usuario y password
+# 4. Whitelist IP: 0.0.0.0/0 (permitir todas las IPs)
+# 5. Obtener connection string
+# 6. Agregar MONGO_URI en Render Dashboard como variable de entorno
+#    para el servicio 'servicio-mantenimientos'
