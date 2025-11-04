@@ -72,13 +72,30 @@ export default function Dashboard() {
   return (
     <Layout>
       <Box>
-        <Heading mb={6}>Dashboard - Sistema de Gestión de Activos</Heading>
+        {/* Banner destacado con gradiente */}
+        <Box
+          bgGradient="linear(to-r, teal.500, blue.500, purple.600)"
+          p={8}
+          borderRadius="xl"
+          mb={6}
+          boxShadow="2xl"
+        >
+          <Heading size="2xl" color="white" mb={3} textAlign="center">
+            🚀 Sistema de Gestión de Activos
+          </Heading>
+          <Text fontSize="xl" color="white" textAlign="center" fontWeight="bold">
+            ✅ CI/CD Activo con Jenkins + Railway
+          </Text>
+          <Text fontSize="md" color="whiteAlpha.900" textAlign="center" mt={2}>
+            Deploy automático desde rama develop
+          </Text>
+        </Box>
 
         {(!statsActivos || statsActivos.total === 0) && (!statsMantenimientos || statsMantenimientos.total === 0) && (
-          <Card mb={6} bg="blue.50">
+          <Card mb={6} bg="gradient" bgGradient="linear(to-r, green.50, blue.50)">
             <CardBody>
-              <Heading size="md" mb={2}>¡Bienvenido al Sistema!</Heading>
-              <Text>
+              <Heading size="md" mb={2} color="blue.700">¡Bienvenido al Sistema!</Heading>
+              <Text color="gray.700">
                 No hay datos aún. Comienza creando activos y mantenimientos usando el menú superior.
               </Text>
             </CardBody>
