@@ -39,16 +39,12 @@ export default function Dashboard() {
       try {
         setLoading(true);
         const [activosData, mantenimientosData] = await Promise.all([
-          activosService
-            .getEstadisticas()
-            .catch((e) => ({
-              data: { total: 0, porEstado: [], porCategoria: [] },
-            })),
-          mantenimientosService
-            .getEstadisticas()
-            .catch((e) => ({
-              data: { total: 0, porEstado: [], porTipo: [], porPrioridad: [] },
-            })),
+          activosService.getEstadisticas().catch((e) => ({
+            data: { total: 0, porEstado: [], porCategoria: [] },
+          })),
+          mantenimientosService.getEstadisticas().catch((e) => ({
+            data: { total: 0, porEstado: [], porTipo: [], porPrioridad: [] },
+          })),
         ]);
 
         setStatsActivos(activosData.data);
@@ -100,7 +96,7 @@ export default function Dashboard() {
           boxShadow="2xl"
         >
           <Heading size="2xl" color="white" mb={3} textAlign="center">
-            🚀 Sistema de Gestión de ActivosXD
+            🚀 Sistema de Gestión de Activos
           </Heading>
           <Text
             fontSize="xl"
