@@ -70,11 +70,6 @@ pipeline {
             }
         }
 
-        // TEMPORALMENTE COMENTADO - Tests requieren ajustes en archivos de test
-        // - servicio-activos: necesita inicialización de tablas y tipos ENUM
-        // - servicio-mantenimientos: mongodb-memory-server incompatible con Debian 13
-        // TODO: Actualizar tests para usar bases de datos reales en lugar de en memoria
-        /*
         stage('Run Tests') {
             parallel {
                 stage('Test Activos') {
@@ -123,7 +118,6 @@ pipeline {
                 }
             }
         }
-        */
 
         stage('Build Docker Images') {
             // Quitamos la condición 'when' para que siempre se ejecute

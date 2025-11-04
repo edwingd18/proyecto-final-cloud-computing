@@ -8,6 +8,11 @@ describe('Servicio de Activos - Tests', () => {
 
   // Setup antes de todos los tests
   beforeAll(async () => {
+    // Eliminar tipos ENUM existentes antes de sincronizar
+    await sequelize.query('DROP TYPE IF EXISTS "enum_activos_estado" CASCADE;');
+    await sequelize.query('DROP TYPE IF EXISTS "enum_activos_categoria" CASCADE;');
+
+    // Sincronizar modelos (force: true elimina y recrea tablas)
     await sequelize.sync({ force: true });
   });
 

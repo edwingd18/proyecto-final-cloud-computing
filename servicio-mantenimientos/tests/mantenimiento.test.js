@@ -1,24 +1,28 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const app = require('../src/index');
 const Mantenimiento = require('../src/models/Mantenimiento');
 
-let mongoServer;
 let mantenimientoId;
 
 describe('Servicio de Mantenimientos - Tests', () => {
   // Setup antes de todos los tests
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
+    // Usar MongoDB real desde variables de entorno o contenedor Docker
+    const mongoUri = process.env.MONGO_URI || 'mongodb://mongodb:27017/mantenimientos_test_db';
+
+    // Desconectar si ya hay una conexión
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+
+    // Conectar a MongoDB
     await mongoose.connect(mongoUri);
   });
 
   // Cleanup después de todos los tests
   afterAll(async () => {
     await mongoose.disconnect();
-    await mongoServer.stop();
   });
 
   // Limpiar colección antes de cada test
