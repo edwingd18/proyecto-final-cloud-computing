@@ -156,6 +156,10 @@ services:
     networks:
       - microservices-network
     restart: unless-stopped
+    # Script de inicio para dar permisos a Docker socket
+    command: >
+      bash -c "chmod 666 /var/run/docker.sock &&
+      /usr/local/bin/jenkins.sh"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/jenkins/login || exit 1"]
       interval: 30s
