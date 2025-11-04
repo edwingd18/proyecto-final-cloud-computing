@@ -363,10 +363,8 @@ exports.getEstadisticas = async (req, res) => {
       }
     ]);
 
-    // ROMPIENDO TEST INTENCIONALMENTE - Jenkins debería bloquear esto
-    res.status(500).json({
-      success: false,
-      message: 'Error intencional para probar CI/CD',
+    res.json({
+      success: true,
       data: {
         total,
         porEstado,
