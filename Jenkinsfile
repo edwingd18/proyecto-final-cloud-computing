@@ -110,9 +110,7 @@ pipeline {
         */
 
         stage('Build Docker Images') {
-            when {
-                branch 'main'
-            }
+            // Quitamos la condición 'when' para que siempre se ejecute
             steps {
                 script {
                     echo '========================================='
