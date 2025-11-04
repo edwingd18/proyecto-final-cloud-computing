@@ -15,7 +15,11 @@ COPY . .
 
 # Variables de entorno
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_URL=http://localhost:3000/api
+ENV NEXT_PUBLIC_API_URL=https://api-gateway-production-7894.up.railway.app/api
+
+
+
+
 ENV PORT=3003
 
 # Construir la aplicación
