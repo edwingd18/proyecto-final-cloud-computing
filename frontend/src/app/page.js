@@ -96,7 +96,7 @@ export default function Dashboard() {
           boxShadow="2xl"
         >
           <Heading size="2xl" color="white" mb={3} textAlign="center">
-            🚀 Sistema de Gestión de Activos
+            🚀 Sistema de Gestión de Activoss
           </Heading>
           <Text
             fontSize="xl"
