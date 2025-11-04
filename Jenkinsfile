@@ -120,7 +120,6 @@ pipeline {
         }
 
         stage('Build Docker Images') {
-            // Quitamos la condición 'when' para que siempre se ejecute
             steps {
                 script {
                     echo '========================================='
@@ -134,45 +133,53 @@ pipeline {
             }
         }
 
-        // TEMPORALMENTE COMENTADO - Descomentar después de configurar Render
-        /*
-        stage('Deploy to Render') {
+        stage('Deploy to Production') {
             when {
-                branch 'main'
+                branch 'develop'
             }
             steps {
                 script {
                     echo '========================================='
-                    echo '  🚀 DEPLOY: Desplegando a Render'
+                    echo '  🚀 DEPLOY: Tests pasaron - Desplegando a producción'
                     echo '========================================='
+                    echo '✅ Todos los tests pasaron correctamente'
+                    echo '📦 Haciendo merge de develop a main...'
+                }
 
-                    // Opción 1: Push a repositorio que Render monitorea
-                    withCredentials([usernamePassword(
-                        credentialsId: env.GIT_CREDENTIALS,
-                        usernameVariable: 'GIT_USERNAME',
-                        passwordVariable: 'GIT_PASSWORD'
-                    )]) {
-                        sh '''
-                            # Configurar Git
-                            git config user.name "Jenkins CI"
-                            git config user.email "jenkins@ci.local"
+                withCredentials([usernamePassword(
+                    credentialsId: env.GIT_CREDENTIALS,
+                    usernameVariable: 'GIT_USERNAME',
+                    passwordVariable: 'GIT_PASSWORD'
+                )]) {
+                    sh '''
+                        # Configurar Git
+                        git config user.name "Jenkins CI"
+                        git config user.email "jenkins@ci.local"
 
-                            # Agregar remote de Render si no existe
-                            if ! git remote | grep -q render; then
-                                git remote add render ${RENDER_REPO_URL}
-                            fi
+                        # Fetch con credenciales en URL
+                        git fetch https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/edwingd18/proyecto-final-cloud-computing.git
 
-                            # Push a Render (esto triggerea el deployment automático)
-                            git push render HEAD:main --force || echo "Push to Render completed"
-                        '''
-                    }
+                        # Cambiar a main
+                        git checkout -B main FETCH_HEAD
 
-                    echo '✅ Código pusheado a Render. Deployment automático iniciado.'
-                    echo '📊 Verifica el progreso en: https://dashboard.render.com/'
+                        # Hacer merge de la rama develop actual
+                        git merge develop --no-ff -m "Merge develop to main - Build #${BUILD_NUMBER} - All tests passed"
+
+                        # Push a main
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/edwingd18/proyecto-final-cloud-computing.git main
+
+                        # Volver a develop
+                        git checkout develop
+                    '''
+                }
+
+                script {
+                    echo '✅ Merge completado exitosamente'
+                    echo '🚀 Railway detectará el cambio en main y desplegará automáticamente'
+                    echo '📊 Verifica el progreso en: https://railway.app/dashboard'
                 }
             }
         }
-        */
     }
 
     post {
