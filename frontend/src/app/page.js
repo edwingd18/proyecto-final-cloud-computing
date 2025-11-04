@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Box,
   Grid,
@@ -16,12 +16,17 @@ import {
   Text,
   Icon,
   SimpleGrid,
-  useToast
-} from '@chakra-ui/react';
-import { FiPackage, FiTool, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
-import Layout from '@/components/Layout';
-import { activosService } from '@/services/activosService';
-import { mantenimientosService } from '@/services/mantenimientosService';
+  useToast,
+} from "@chakra-ui/react";
+import {
+  FiPackage,
+  FiTool,
+  FiAlertCircle,
+  FiCheckCircle,
+} from "react-icons/fi";
+import Layout from "@/components/Layout";
+import { activosService } from "@/services/activosService";
+import { mantenimientosService } from "@/services/mantenimientosService";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -34,20 +39,34 @@ export default function Dashboard() {
       try {
         setLoading(true);
         const [activosData, mantenimientosData] = await Promise.all([
-          activosService.getEstadisticas().catch(e => ({ data: { total: 0, porEstado: [], porCategoria: [] } })),
-          mantenimientosService.getEstadisticas().catch(e => ({ data: { total: 0, porEstado: [], porTipo: [], porPrioridad: [] } }))
+          activosService
+            .getEstadisticas()
+            .catch((e) => ({
+              data: { total: 0, porEstado: [], porCategoria: [] },
+            })),
+          mantenimientosService
+            .getEstadisticas()
+            .catch((e) => ({
+              data: { total: 0, porEstado: [], porTipo: [], porPrioridad: [] },
+            })),
         ]);
 
         setStatsActivos(activosData.data);
         setStatsMantenimientos(mantenimientosData.data);
       } catch (error) {
-        console.error('Error al cargar estadísticas:', error);
+        console.error("Error al cargar estadísticas:", error);
         setStatsActivos({ total: 0, porEstado: [], porCategoria: [] });
-        setStatsMantenimientos({ total: 0, porEstado: [], porTipo: [], porPrioridad: [] });
+        setStatsMantenimientos({
+          total: 0,
+          porEstado: [],
+          porTipo: [],
+          porPrioridad: [],
+        });
         toast({
-          title: 'Advertencia',
-          description: 'Mostrando datos vacíos. Verifica que los servicios estén corriendo.',
-          status: 'warning',
+          title: "Advertencia",
+          description:
+            "Mostrando datos vacíos. Verifica que los servicios estén corriendo.",
+          status: "warning",
           duration: 5000,
           isClosable: true,
         });
@@ -81,9 +100,14 @@ export default function Dashboard() {
           boxShadow="2xl"
         >
           <Heading size="2xl" color="white" mb={3} textAlign="center">
-            🚀 Sistema de Gestión de Activos
+            🚀 Sistema de Gestión de ActivosXD
           </Heading>
-          <Text fontSize="xl" color="white" textAlign="center" fontWeight="bold">
+          <Text
+            fontSize="xl"
+            color="white"
+            textAlign="center"
+            fontWeight="bold"
+          >
             ✅ CI/CD Activo con Jenkins + Railway
           </Text>
           <Text fontSize="md" color="whiteAlpha.900" textAlign="center" mt={2}>
@@ -91,16 +115,24 @@ export default function Dashboard() {
           </Text>
         </Box>
 
-        {(!statsActivos || statsActivos.total === 0) && (!statsMantenimientos || statsMantenimientos.total === 0) && (
-          <Card mb={6} bg="gradient" bgGradient="linear(to-r, green.50, blue.50)">
-            <CardBody>
-              <Heading size="md" mb={2} color="blue.700">¡Bienvenido al Sistema!</Heading>
-              <Text color="gray.700">
-                No hay datos aún. Comienza creando activos y mantenimientos usando el menú superior.
-              </Text>
-            </CardBody>
-          </Card>
-        )}
+        {(!statsActivos || statsActivos.total === 0) &&
+          (!statsMantenimientos || statsMantenimientos.total === 0) && (
+            <Card
+              mb={6}
+              bg="gradient"
+              bgGradient="linear(to-r, green.50, blue.50)"
+            >
+              <CardBody>
+                <Heading size="md" mb={2} color="blue.700">
+                  ¡Bienvenido al Sistema!
+                </Heading>
+                <Text color="gray.700">
+                  No hay datos aún. Comienza creando activos y mantenimientos
+                  usando el menú superior.
+                </Text>
+              </CardBody>
+            </Card>
+          )}
 
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={8}>
           <Card>
@@ -135,7 +167,8 @@ export default function Dashboard() {
                 <StatLabel>Activos Activos</StatLabel>
                 <StatNumber display="flex" alignItems="center">
                   <Icon as={FiCheckCircle} mr={2} color="green.500" />
-                  {statsActivos?.porEstado?.find(e => e.estado === 'activo')?.count || 0}
+                  {statsActivos?.porEstado?.find((e) => e.estado === "activo")
+                    ?.count || 0}
                 </StatNumber>
                 <StatHelpText>En funcionamiento</StatHelpText>
               </Stat>
@@ -148,7 +181,9 @@ export default function Dashboard() {
                 <StatLabel>En Reparación</StatLabel>
                 <StatNumber display="flex" alignItems="center">
                   <Icon as={FiAlertCircle} mr={2} color="orange.500" />
-                  {statsActivos?.porEstado?.find(e => e.estado === 'en_reparacion')?.count || 0}
+                  {statsActivos?.porEstado?.find(
+                    (e) => e.estado === "en_reparacion"
+                  )?.count || 0}
                 </StatNumber>
                 <StatHelpText>Requieren atención</StatHelpText>
               </Stat>
@@ -156,11 +191,13 @@ export default function Dashboard() {
           </Card>
         </SimpleGrid>
 
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
+        <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }} gap={6}>
           {/* Estado de Activos */}
           <Card>
             <CardBody>
-              <Heading size="md" mb={4}>Estado de Activos</Heading>
+              <Heading size="md" mb={4}>
+                Estado de Activos
+              </Heading>
               {statsActivos?.porEstado?.map((item) => (
                 <Box key={item.estado} mb={3}>
                   <Text fontWeight="bold" textTransform="capitalize">
@@ -174,11 +211,13 @@ export default function Dashboard() {
           {/* Categorías de Activos */}
           <Card>
             <CardBody>
-              <Heading size="md" mb={4}>Categorías de Activos</Heading>
+              <Heading size="md" mb={4}>
+                Categorías de Activos
+              </Heading>
               {statsActivos?.porCategoria?.map((item) => (
                 <Box key={item.categoria} mb={3}>
                   <Text fontWeight="bold" textTransform="capitalize">
-                    {item.categoria.replace('_', ' ')}: {item.count}
+                    {item.categoria.replace("_", " ")}: {item.count}
                   </Text>
                 </Box>
               ))}
@@ -188,7 +227,9 @@ export default function Dashboard() {
           {/* Estado de Mantenimientos */}
           <Card>
             <CardBody>
-              <Heading size="md" mb={4}>Estado de Mantenimientos</Heading>
+              <Heading size="md" mb={4}>
+                Estado de Mantenimientos
+              </Heading>
               {statsMantenimientos?.porEstado?.map((item) => (
                 <Box key={item._id} mb={3}>
                   <Text fontWeight="bold" textTransform="capitalize">
@@ -202,7 +243,9 @@ export default function Dashboard() {
           {/* Tipos de Mantenimiento */}
           <Card>
             <CardBody>
-              <Heading size="md" mb={4}>Tipos de Mantenimiento</Heading>
+              <Heading size="md" mb={4}>
+                Tipos de Mantenimiento
+              </Heading>
               {statsMantenimientos?.porTipo?.map((item) => (
                 <Box key={item._id} mb={3}>
                   <Text fontWeight="bold" textTransform="capitalize">
