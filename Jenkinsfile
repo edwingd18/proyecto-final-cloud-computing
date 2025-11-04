@@ -70,9 +70,6 @@ pipeline {
             }
         }
 
-        // TEMPORALMENTE COMENTADO - Los tests requieren bases de datos
-        // Descomentar después de configurar PostgreSQL y MongoDB en Jenkins
-        /*
         stage('Run Tests') {
             parallel {
                 stage('Test Activos') {
@@ -81,7 +78,16 @@ pipeline {
                             echo '🧪 Ejecutando tests - Servicio Activos'
                         }
                         dir('servicio-activos') {
-                            sh 'npm test'
+                            // Configurar variables de entorno para tests
+                            sh '''
+                                export DB_HOST=postgres
+                                export DB_PORT=5432
+                                export DB_NAME=activos_db
+                                export DB_USER=postgres
+                                export DB_PASSWORD=postgres123
+                                export NODE_ENV=test
+                                npm test
+                            '''
                         }
                     }
                     post {
@@ -96,7 +102,12 @@ pipeline {
                             echo '🧪 Ejecutando tests - Servicio Mantenimientos'
                         }
                         dir('servicio-mantenimientos') {
-                            sh 'npm test'
+                            // Configurar variables de entorno para tests
+                            sh '''
+                                export MONGO_URI=mongodb://mongodb:27017/mantenimientos_test_db
+                                export NODE_ENV=test
+                                npm test
+                            '''
                         }
                     }
                     post {
@@ -107,7 +118,6 @@ pipeline {
                 }
             }
         }
-        */
 
         stage('Build Docker Images') {
             // Quitamos la condición 'when' para que siempre se ejecute
