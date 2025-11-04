@@ -156,16 +156,16 @@ pipeline {
                         git config user.name "Jenkins CI"
                         git config user.email "jenkins@ci.local"
 
-                        # Fetch todas las ramas remotas
-                        git fetch origin
+                        # Fetch con credenciales en URL
+                        git fetch https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/edwingd18/proyecto-final-cloud-computing.git
 
-                        # Cambiar a main (crear local tracking de origin/main)
-                        git checkout -B main origin/main
+                        # Cambiar a main
+                        git checkout -B main FETCH_HEAD
 
-                        # Hacer merge de develop a main
-                        git merge origin/develop --no-ff -m "Merge develop to main - Build #${BUILD_NUMBER} - All tests passed"
+                        # Hacer merge de la rama develop actual
+                        git merge develop --no-ff -m "Merge develop to main - Build #${BUILD_NUMBER} - All tests passed"
 
-                        # Push a main con credenciales (esto triggeará Railway automáticamente)
+                        # Push a main
                         git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/edwingd18/proyecto-final-cloud-computing.git main
 
                         # Volver a develop
