@@ -118,7 +118,7 @@ pipeline {
                     echo '========================================='
                 }
                 sh '''
-                    docker-compose build --no-cache
+                    docker compose build --no-cache
                     docker images | grep proyecto-fina-cloud-computing
                 '''
             }

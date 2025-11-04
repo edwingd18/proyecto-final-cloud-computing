@@ -141,7 +141,9 @@ services:
 
   # Jenkins para CI/CD
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    build:
+      context: .
+      dockerfile: jenkins.Dockerfile
     container_name: jenkins
     user: root
     environment:
@@ -156,16 +158,12 @@ services:
     networks:
       - microservices-network
     restart: unless-stopped
-    # Script de inicio para dar permisos a Docker socket
-    command: >
-      bash -c "chmod 666 /var/run/docker.sock &&
-      /usr/local/bin/jenkins.sh"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/jenkins/login || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 90s
 
 networks:
   microservices-network:
