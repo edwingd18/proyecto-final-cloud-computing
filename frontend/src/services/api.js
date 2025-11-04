@@ -1,11 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://api-gateway-production-7894.up.railway.app/api";
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 10000,
 });
@@ -25,8 +27,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = error.response?.data?.message || error.message || 'Error desconocido';
-    console.error('Error en API:', message);
+    const message =
+      error.response?.data?.message || error.message || "Error desconocido";
+    console.error("Error en API:", message);
     return Promise.reject(error);
   }
 );
