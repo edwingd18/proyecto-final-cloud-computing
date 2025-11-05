@@ -226,12 +226,13 @@ pipeline {
                 """
 
                 try {
+                    writeFile file: 'discord-payload.json', text: discordMessage
                     withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
-                        sh """
-                            curl -X POST -H "Content-Type: application/json" \
-                                 -d '${discordMessage}' \
-                                 "\${WEBHOOK_URL}"
-                        """
+                        sh '''
+                            curl -X POST "${WEBHOOK_URL}" \
+                                 -H "Content-Type: application/json" \
+                                 -d @discord-payload.json
+                        '''
                     }
                 } catch (Exception e) {
                     echo "No se pudo enviar notificación a Discord: ${e.message}"
@@ -296,12 +297,13 @@ pipeline {
                 """
 
                 try {
+                    writeFile file: 'discord-payload.json', text: discordMessage
                     withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
-                        sh """
-                            curl -X POST -H "Content-Type: application/json" \
-                                 -d '${discordMessage}' \
-                                 "\${WEBHOOK_URL}"
-                        """
+                        sh '''
+                            curl -X POST "${WEBHOOK_URL}" \
+                                 -H "Content-Type: application/json" \
+                                 -d @discord-payload.json
+                        '''
                     }
                 } catch (Exception e) {
                     echo "No se pudo enviar notificación a Discord: ${e.message}"
