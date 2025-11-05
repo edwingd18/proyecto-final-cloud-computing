@@ -104,7 +104,7 @@ export default function Dashboard() {
             textAlign="center"
             fontWeight="bold"
           >
-            ✅ CI/CD Activo con Jenkins + Railway
+            ✅ CI/CD Activo con Jenkins + Railway CAMBIO!!
           </Text>
           <Text fontSize="md" color="whiteAlpha.900" textAlign="center" mt={2}>
             Deploy automático desde rama develop
