@@ -207,7 +207,7 @@ pipeline {
                             },
                             {
                                 "name": "🌿 Branch",
-                                "value": "\`${env.GIT_BRANCH.replace('origin/', '')}\`",
+                                "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
                                 "inline": true
                             },
                             {
@@ -217,7 +217,7 @@ pipeline {
                             },
                             {
                                 "name": "📝 Commit",
-                                "value": "[\`${env.GIT_COMMIT?.take(7)}\`](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
+                                "value": "[${env.GIT_COMMIT?.take(7)}](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
                                 "inline": true
                             },
                             {
@@ -302,7 +302,7 @@ curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payl
                             },
                             {
                                 "name": "🌿 Branch",
-                                "value": "\`${env.GIT_BRANCH.replace('origin/', '')}\`",
+                                "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
                                 "inline": true
                             },
                             {
@@ -312,7 +312,7 @@ curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payl
                             },
                             {
                                 "name": "📝 Commit",
-                                "value": "[\`${env.GIT_COMMIT?.take(7)}\`](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
+                                "value": "[${env.GIT_COMMIT?.take(7)}](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
                                 "inline": true
                             },
                             {
