@@ -142,19 +142,21 @@ services:
   # Jenkins para CI/CD
   jenkins:
     build:
-      context: .
-      dockerfile: jenkins.Dockerfile
+      context: ./jenkins
+      dockerfile: Dockerfile
     container_name: jenkins
     user: root
     environment:
       - JENKINS_OPTS=--prefix=/jenkins
       - DOCKER_HOST=unix:///var/run/docker.sock
+      - JENKINS_ADMIN_PASSWORD=admin123
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./jenkins/jcasc.yaml:/var/casc_configs/jcasc.yaml:ro
     networks:
       - microservices-network
     restart: unless-stopped

@@ -1,0 +1,55 @@
+jenkins:
+  systemMessage: "Jenkins CI/CD - Sistema de Gestión de Activos"
+  numExecutors: 2
+  mode: NORMAL
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "${JENKINS_ADMIN_PASSWORD:-admin123}"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          # GitHub Credentials - IMPORTANTE: Debes agregar esto manualmente
+          # Ve a: Manage Jenkins > Credentials > System > Global credentials
+          # Tipo: Username with password
+          # ID: github-credentials
+          # Username: tu-usuario-github
+          # Password: tu-personal-access-token
+
+          # Discord Webhook - IMPORTANTE: Debes agregar esto manualmente
+          # Ve a: Manage Jenkins > Credentials > System > Global credentials
+          # Tipo: Secret text
+          # ID: discord-webhook
+          # Secret: https://discord.com/api/webhooks/...
+
+          # Estos se agregan manualmente por seguridad
+          # NO versionar tokens/passwords reales en Git
+
+tool:
+  nodejs:
+    installations:
+      - name: "NodeJS 20"
+        properties:
+          - installSource:
+              installers:
+                - nodeJSInstaller:
+                    id: "20.11.0"
+                    npmPackagesRefreshHours: 72
+
+unclassified:
+  location:
+    url: "http://localhost:8080/jenkins/"
+    adminAddress: "jenkins@ci.local"
+
+  scmGit:
+    globalConfigName: "Jenkins CI"
+    globalConfigEmail: "jenkins@ci.local"

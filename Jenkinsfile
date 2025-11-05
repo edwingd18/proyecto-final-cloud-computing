@@ -10,7 +10,6 @@ pipeline {
         PROJECT_NAME = 'sistema-gestion-activos'
         GIT_CREDENTIALS = 'github-credentials'
         DISCORD_WEBHOOK = credentials('discord-webhook')
-        // RENDER_REPO_URL = credentials('render-git-url') // Comentado hasta configurar Render
     }
 
     stages {
@@ -117,20 +116,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    echo '========================================='
-                    echo '  🐳 BUILD: Construyendo imágenes Docker'
-                    echo '========================================='
-                }
-                sh '''
-                    docker compose build --no-cache
-                    docker images | grep proyecto-fina-cloud-computing
-                '''
             }
         }
 
