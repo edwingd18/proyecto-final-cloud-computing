@@ -1,0 +1,10 @@
+git:latest
+workflow-aggregator:latest
+docker-workflow:latest
+blueocean:latest
+credentials:latest
+credentials-binding:latest
+configuration-as-code:latest
+nodejs:latest
+junit:latest
+github:latest

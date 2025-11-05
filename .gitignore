@@ -40,6 +40,7 @@ Thumbs.db
 # Misc
 *.pem
 .cache/
-CI_CD_FLOW.md
-JENKINS_SETUP.md
-SETUP_CHECKLIST.md
+
+# Jenkins - NO versionar backups ni datos sensibles
+jenkins-backup.tar.gz
+jenkins_home/
