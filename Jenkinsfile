@@ -25,45 +25,84 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup Cache') {
+            steps {
+                script {
+                    echo '🗄️ Configurando cache de npm...'
+                    // Crear directorio de cache si no existe
+                    sh '''
+                        mkdir -p $HOME/.npm-cache
+                        echo "Cache directory: $HOME/.npm-cache"
+                        du -sh $HOME/.npm-cache 2>/dev/null || echo "Cache vacío"
+                    '''
+                }
+            }
+        }
+
+        stage('Install Dependencies - Batch 1') {
             parallel {
-                stage('Install Activos') {
+                stage('Install Frontend') {
                     steps {
-                        script {
-                            echo '📦 Instalando dependencias - Servicio Activos'
-                        }
-                        dir('servicio-activos') {
-                            sh 'npm install'
+                        timeout(time: 10, unit: 'MINUTES') {
+                            script {
+                                echo '📦 Instalando dependencias - Frontend (Next.js)'
+                            }
+                            dir('frontend') {
+                                sh '''
+                                    npm config set cache $HOME/.npm-cache --global
+                                    npm ci --prefer-offline --no-audit
+                                '''
+                            }
                         }
                     }
                 }
+                stage('Install Activos') {
+                    steps {
+                        timeout(time: 5, unit: 'MINUTES') {
+                            script {
+                                echo '📦 Instalando dependencias - Servicio Activos'
+                            }
+                            dir('servicio-activos') {
+                                sh '''
+                                    npm config set cache $HOME/.npm-cache --global
+                                    npm ci --prefer-offline --no-audit
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies - Batch 2') {
+            parallel {
                 stage('Install Mantenimientos') {
                     steps {
-                        script {
-                            echo '📦 Instalando dependencias - Servicio Mantenimientos'
-                        }
-                        dir('servicio-mantenimientos') {
-                            sh 'npm install'
+                        timeout(time: 5, unit: 'MINUTES') {
+                            script {
+                                echo '📦 Instalando dependencias - Servicio Mantenimientos'
+                            }
+                            dir('servicio-mantenimientos') {
+                                sh '''
+                                    npm config set cache $HOME/.npm-cache --global
+                                    npm ci --prefer-offline --no-audit
+                                '''
+                            }
                         }
                     }
                 }
                 stage('Install API Gateway') {
                     steps {
-                        script {
-                            echo '📦 Instalando dependencias - API Gateway'
-                        }
-                        dir('api-gateway') {
-                            sh 'npm install'
-                        }
-                    }
-                }
-                stage('Install Frontend') {
-                    steps {
-                        script {
-                            echo '📦 Instalando dependencias - Frontend'
-                        }
-                        dir('frontend') {
-                            sh 'npm install'
+                        timeout(time: 5, unit: 'MINUTES') {
+                            script {
+                                echo '📦 Instalando dependencias - API Gateway'
+                            }
+                            dir('api-gateway') {
+                                sh '''
+                                    npm config set cache $HOME/.npm-cache --global
+                                    npm ci --prefer-offline --no-audit
+                                '''
+                            }
                         }
                     }
                 }

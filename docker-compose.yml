@@ -158,6 +158,7 @@ services:
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
+      - npm_cache:/root/.npm-cache
       - /var/run/docker.sock:/var/run/docker.sock
       - ./jenkins/jcasc.yaml:/var/casc_configs/jcasc.yaml:ro
     networks:
@@ -182,3 +183,5 @@ volumes:
     name: mongodb-mantenimientos-data
   jenkins_home:
     name: jenkins-home-data
+  npm_cache:
+    name: jenkins-npm-cache
