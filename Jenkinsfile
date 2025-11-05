@@ -170,62 +170,62 @@ pipeline {
 
     post {
         success {
-            node {
-                script {
-                    echo '========================================='
-                    echo '  ✅ BUILD EXITOSO'
-                    echo '========================================='
-                    echo "Commit: ${env.GIT_COMMIT}"
-                    echo "Branch: ${env.GIT_BRANCH}"
-                    echo "Build: #${env.BUILD_NUMBER}"
+            script {
+                echo '========================================='
+                echo '  ✅ BUILD EXITOSO'
+                echo '========================================='
+                echo "Commit: ${env.GIT_COMMIT}"
+                echo "Branch: ${env.GIT_BRANCH}"
+                echo "Build: #${env.BUILD_NUMBER}"
 
-                    // Notificación Discord - Build Exitoso
-                    def discordMessage = """
-                    {
-                        "embeds": [{
-                            "title": "✅ Build Exitoso - Sistema Gestión de Activos",
-                            "description": "El pipeline se ejecutó correctamente",
-                            "color": 3066993,
-                            "fields": [
-                                {
-                                    "name": "📋 Build",
-                                    "value": "#${env.BUILD_NUMBER}",
-                                    "inline": true
-                                },
-                                {
-                                    "name": "🌿 Branch",
-                                    "value": "${env.GIT_BRANCH}",
-                                    "inline": true
-                                },
-                                {
-                                    "name": "📝 Commit",
-                                    "value": "${env.GIT_COMMIT?.take(8)}",
-                                    "inline": true
-                                },
-                                {
-                                    "name": "🧪 Tests",
-                                    "value": "28/28 pasaron ✅\\n(13 Activos + 15 Mantenimientos)",
-                                    "inline": false
-                                },
-                                {
-                                    "name": "🚀 Estado Deploy",
-                                    "value": "${env.GIT_BRANCH == 'develop' ? '✅ Merged a main\\n🔄 Railway desplegando...' : 'ℹ️ No deploy (branch: ' + env.GIT_BRANCH + ')'}",
-                                    "inline": false
-                                },
-                                {
-                                    "name": "🔗 Jenkins",
-                                    "value": "[Ver logs](${env.BUILD_URL}console)",
-                                    "inline": false
-                                }
-                            ],
-                            "footer": {
-                                "text": "Jenkins CI/CD"
+                // Notificación Discord - Build Exitoso
+                def discordMessage = """
+                {
+                    "embeds": [{
+                        "title": "✅ Build Exitoso - Sistema Gestión de Activos",
+                        "description": "El pipeline se ejecutó correctamente",
+                        "color": 3066993,
+                        "fields": [
+                            {
+                                "name": "📋 Build",
+                                "value": "#${env.BUILD_NUMBER}",
+                                "inline": true
                             },
-                            "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
-                        }]
-                    }
-                    """
+                            {
+                                "name": "🌿 Branch",
+                                "value": "${env.GIT_BRANCH}",
+                                "inline": true
+                            },
+                            {
+                                "name": "📝 Commit",
+                                "value": "${env.GIT_COMMIT?.take(8)}",
+                                "inline": true
+                            },
+                            {
+                                "name": "🧪 Tests",
+                                "value": "28/28 pasaron ✅\\n(13 Activos + 15 Mantenimientos)",
+                                "inline": false
+                            },
+                            {
+                                "name": "🚀 Estado Deploy",
+                                "value": "${env.GIT_BRANCH == 'develop' ? '✅ Merged a main\\n🔄 Railway desplegando...' : 'ℹ️ No deploy (branch: ' + env.GIT_BRANCH + ')'}",
+                                "inline": false
+                            },
+                            {
+                                "name": "🔗 Jenkins",
+                                "value": "[Ver logs](${env.BUILD_URL}console)",
+                                "inline": false
+                            }
+                        ],
+                        "footer": {
+                            "text": "Jenkins CI/CD"
+                        },
+                        "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
+                    }]
+                }
+                """
 
+                try {
                     withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
                         sh """
                             curl -X POST -H "Content-Type: application/json" \
@@ -233,67 +233,69 @@ pipeline {
                                  "\${WEBHOOK_URL}"
                         """
                     }
+                } catch (Exception e) {
+                    echo "No se pudo enviar notificación a Discord: ${e.message}"
                 }
             }
         }
 
         failure {
-            node {
-                script {
-                    echo '========================================='
-                    echo '  ❌ BUILD FALLIDO'
-                    echo '========================================='
-                    echo "Commit: ${env.GIT_COMMIT}"
-                    echo "Branch: ${env.GIT_BRANCH}"
-                    echo "Build: #${env.BUILD_NUMBER}"
+            script {
+                echo '========================================='
+                echo '  ❌ BUILD FALLIDO'
+                echo '========================================='
+                echo "Commit: ${env.GIT_COMMIT}"
+                echo "Branch: ${env.GIT_BRANCH}"
+                echo "Build: #${env.BUILD_NUMBER}"
 
-                    // Notificación Discord - Build Fallido
-                    def discordMessage = """
-                    {
-                        "embeds": [{
-                            "title": "❌ Build Fallido - Sistema Gestión de Activos",
-                            "description": "El pipeline encontró errores",
-                            "color": 15158332,
-                            "fields": [
-                                {
-                                    "name": "📋 Build",
-                                    "value": "#${env.BUILD_NUMBER}",
-                                    "inline": true
-                                },
-                                {
-                                    "name": "🌿 Branch",
-                                    "value": "${env.GIT_BRANCH}",
-                                    "inline": true
-                                },
-                                {
-                                    "name": "📝 Commit",
-                                    "value": "${env.GIT_COMMIT?.take(8)}",
-                                    "inline": true
-                                },
-                                {
-                                    "name": "❌ Problema",
-                                    "value": "Tests fallaron o error en build",
-                                    "inline": false
-                                },
-                                {
-                                    "name": "🚫 Estado Deploy",
-                                    "value": "⛔ NO se hizo merge a main\\n🔒 Producción protegida",
-                                    "inline": false
-                                },
-                                {
-                                    "name": "🔗 Jenkins",
-                                    "value": "[Ver logs y detalles del error](${env.BUILD_URL}console)",
-                                    "inline": false
-                                }
-                            ],
-                            "footer": {
-                                "text": "Jenkins CI/CD - Revisa los logs"
+                // Notificación Discord - Build Fallido
+                def discordMessage = """
+                {
+                    "embeds": [{
+                        "title": "❌ Build Fallido - Sistema Gestión de Activos",
+                        "description": "El pipeline encontró errores",
+                        "color": 15158332,
+                        "fields": [
+                            {
+                                "name": "📋 Build",
+                                "value": "#${env.BUILD_NUMBER}",
+                                "inline": true
                             },
-                            "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
-                        }]
-                    }
-                    """
+                            {
+                                "name": "🌿 Branch",
+                                "value": "${env.GIT_BRANCH}",
+                                "inline": true
+                            },
+                            {
+                                "name": "📝 Commit",
+                                "value": "${env.GIT_COMMIT?.take(8)}",
+                                "inline": true
+                            },
+                            {
+                                "name": "❌ Problema",
+                                "value": "Tests fallaron o error en build",
+                                "inline": false
+                            },
+                            {
+                                "name": "🚫 Estado Deploy",
+                                "value": "⛔ NO se hizo merge a main\\n🔒 Producción protegida",
+                                "inline": false
+                            },
+                            {
+                                "name": "🔗 Jenkins",
+                                "value": "[Ver logs y detalles del error](${env.BUILD_URL}console)",
+                                "inline": false
+                            }
+                        ],
+                        "footer": {
+                            "text": "Jenkins CI/CD - Revisa los logs"
+                        },
+                        "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
+                    }]
+                }
+                """
 
+                try {
                     withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
                         sh """
                             curl -X POST -H "Content-Type: application/json" \
@@ -301,6 +303,8 @@ pipeline {
                                  "\${WEBHOOK_URL}"
                         """
                     }
+                } catch (Exception e) {
+                    echo "No se pudo enviar notificación a Discord: ${e.message}"
                 }
             }
         }
