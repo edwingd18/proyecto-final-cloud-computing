@@ -121,7 +121,7 @@ pipeline {
 
         stage('Deploy to Production') {
             when {
-                branch 'develop'
+                expression { env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop' }
             }
             steps {
                 script {
