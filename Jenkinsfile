@@ -142,20 +142,20 @@ pipeline {
                         git config user.name "Jenkins CI"
                         git config user.email "jenkins@ci.local"
 
-                        # Fetch con credenciales en URL
-                        git fetch https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/edwingd18/proyecto-final-cloud-computing.git
+                        # Fetch todas las ramas
+                        git fetch https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/edwingd18/proyecto-final-cloud-computing.git +refs/heads/*:refs/remotes/origin/*
 
-                        # Cambiar a main
-                        git checkout -B main FETCH_HEAD
+                        # Checkout de main desde origin
+                        git checkout -B main origin/main
 
-                        # Hacer merge de la rama develop actual
-                        git merge develop --no-ff -m "Merge develop to main - Build #${BUILD_NUMBER} - All tests passed"
+                        # Hacer merge de origin/develop
+                        git merge origin/develop --no-ff -m "Merge develop to main - Build #${BUILD_NUMBER} - All tests passed"
 
                         # Push a main
                         git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/edwingd18/proyecto-final-cloud-computing.git main
 
-                        # Volver a develop
-                        git checkout develop
+                        # Volver a la rama actual
+                        git checkout ${GIT_BRANCH#origin/}
                     '''
                 }
 
