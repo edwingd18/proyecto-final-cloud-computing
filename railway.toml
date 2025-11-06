@@ -1,0 +1,60 @@
+# Railway Configuration for Sistema Gestión de Activos
+
+# Servicio de Activos
+[[services]]
+name = "servicio-activos"
+source = "servicio-activos"
+
+[services.build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[services.deploy]
+startCommand = "node src/index.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "always"
+
+# Servicio de Mantenimientos
+[[services]]
+name = "servicio-mantenimientos"
+source = "servicio-mantenimientos"
+
+[services.build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[services.deploy]
+startCommand = "node src/index.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "always"
+
+# API Gateway
+[[services]]
+name = "api-gateway"
+source = "api-gateway"
+
+[services.build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[services.deploy]
+startCommand = "node src/index.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "always"
+
+# Frontend
+[[services]]
+name = "frontend"
+source = "frontend"
+
+[services.build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[services.deploy]
+startCommand = "node server.js"
+healthcheckTimeout = 100
+restartPolicyType = "always"
