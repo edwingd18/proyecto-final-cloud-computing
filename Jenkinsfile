@@ -43,13 +43,17 @@ pipeline {
             parallel {
                 stage('Install Frontend') {
                     steps {
-                        timeout(time: 10, unit: 'MINUTES') {
+                        timeout(time: 15, unit: 'MINUTES') {
                             script {
                                 echo '📦 Instalando dependencias - Frontend (Next.js)'
                             }
                             dir('frontend') {
                                 sh '''
                                     npm config set cache $HOME/.npm-cache --global
+                                    npm config set fetch-timeout 300000 --global
+                                    npm config set fetch-retries 5 --global
+                                    npm config set fetch-retry-mintimeout 20000 --global
+                                    npm config set fetch-retry-maxtimeout 120000 --global
                                     npm ci --prefer-offline --no-audit
                                 '''
                             }
@@ -58,13 +62,17 @@ pipeline {
                 }
                 stage('Install Activos') {
                     steps {
-                        timeout(time: 5, unit: 'MINUTES') {
+                        timeout(time: 10, unit: 'MINUTES') {
                             script {
                                 echo '📦 Instalando dependencias - Servicio Activos'
                             }
                             dir('servicio-activos') {
                                 sh '''
                                     npm config set cache $HOME/.npm-cache --global
+                                    npm config set fetch-timeout 300000 --global
+                                    npm config set fetch-retries 5 --global
+                                    npm config set fetch-retry-mintimeout 20000 --global
+                                    npm config set fetch-retry-maxtimeout 120000 --global
                                     npm ci --prefer-offline --no-audit
                                 '''
                             }
@@ -78,13 +86,17 @@ pipeline {
             parallel {
                 stage('Install Mantenimientos') {
                     steps {
-                        timeout(time: 5, unit: 'MINUTES') {
+                        timeout(time: 10, unit: 'MINUTES') {
                             script {
                                 echo '📦 Instalando dependencias - Servicio Mantenimientos'
                             }
                             dir('servicio-mantenimientos') {
                                 sh '''
                                     npm config set cache $HOME/.npm-cache --global
+                                    npm config set fetch-timeout 300000 --global
+                                    npm config set fetch-retries 5 --global
+                                    npm config set fetch-retry-mintimeout 20000 --global
+                                    npm config set fetch-retry-maxtimeout 120000 --global
                                     npm ci --prefer-offline --no-audit
                                 '''
                             }
@@ -93,13 +105,17 @@ pipeline {
                 }
                 stage('Install API Gateway') {
                     steps {
-                        timeout(time: 5, unit: 'MINUTES') {
+                        timeout(time: 10, unit: 'MINUTES') {
                             script {
                                 echo '📦 Instalando dependencias - API Gateway'
                             }
                             dir('api-gateway') {
                                 sh '''
                                     npm config set cache $HOME/.npm-cache --global
+                                    npm config set fetch-timeout 300000 --global
+                                    npm config set fetch-retries 5 --global
+                                    npm config set fetch-retry-mintimeout 20000 --global
+                                    npm config set fetch-retry-maxtimeout 120000 --global
                                     npm ci --prefer-offline --no-audit
                                 '''
                             }
@@ -211,6 +227,9 @@ pipeline {
         success {
             script {
                 node {
+                    // Checkout del código para acceder a git log
+                    checkout scm
+
                     echo '========================================='
                     echo '  ✅ BUILD EXITOSO'
                     echo '========================================='
@@ -308,6 +327,9 @@ curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payl
         failure {
             script {
                 node {
+                    // Checkout del código para acceder a git log
+                    checkout scm
+
                     echo '========================================='
                     echo '  ❌ BUILD FALLIDO'
                     echo '========================================='
