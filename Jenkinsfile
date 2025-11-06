@@ -43,13 +43,17 @@ pipeline {
             parallel {
                 stage('Install Frontend') {
                     steps {
-                        timeout(time: 10, unit: 'MINUTES') {
+                        timeout(time: 15, unit: 'MINUTES') {
                             script {
                                 echo '📦 Instalando dependencias - Frontend (Next.js)'
                             }
                             dir('frontend') {
                                 sh '''
                                     npm config set cache $HOME/.npm-cache --global
+                                    npm config set fetch-timeout 300000 --global
+                                    npm config set fetch-retries 5 --global
+                                    npm config set fetch-retry-mintimeout 20000 --global
+                                    npm config set fetch-retry-maxtimeout 120000 --global
                                     npm ci --prefer-offline --no-audit
                                 '''
                             }
@@ -58,13 +62,17 @@ pipeline {
                 }
                 stage('Install Activos') {
                     steps {
-                        timeout(time: 5, unit: 'MINUTES') {
+                        timeout(time: 10, unit: 'MINUTES') {
                             script {
                                 echo '📦 Instalando dependencias - Servicio Activos'
                             }
                             dir('servicio-activos') {
                                 sh '''
                                     npm config set cache $HOME/.npm-cache --global
+                                    npm config set fetch-timeout 300000 --global
+                                    npm config set fetch-retries 5 --global
+                                    npm config set fetch-retry-mintimeout 20000 --global
+                                    npm config set fetch-retry-maxtimeout 120000 --global
                                     npm ci --prefer-offline --no-audit
                                 '''
                             }
@@ -78,13 +86,17 @@ pipeline {
             parallel {
                 stage('Install Mantenimientos') {
                     steps {
-                        timeout(time: 5, unit: 'MINUTES') {
+                        timeout(time: 10, unit: 'MINUTES') {
                             script {
                                 echo '📦 Instalando dependencias - Servicio Mantenimientos'
                             }
                             dir('servicio-mantenimientos') {
                                 sh '''
                                     npm config set cache $HOME/.npm-cache --global
+                                    npm config set fetch-timeout 300000 --global
+                                    npm config set fetch-retries 5 --global
+                                    npm config set fetch-retry-mintimeout 20000 --global
+                                    npm config set fetch-retry-maxtimeout 120000 --global
                                     npm ci --prefer-offline --no-audit
                                 '''
                             }
@@ -93,13 +105,17 @@ pipeline {
                 }
                 stage('Install API Gateway') {
                     steps {
-                        timeout(time: 5, unit: 'MINUTES') {
+                        timeout(time: 10, unit: 'MINUTES') {
                             script {
                                 echo '📦 Instalando dependencias - API Gateway'
                             }
                             dir('api-gateway') {
                                 sh '''
                                     npm config set cache $HOME/.npm-cache --global
+                                    npm config set fetch-timeout 300000 --global
+                                    npm config set fetch-retries 5 --global
+                                    npm config set fetch-retry-mintimeout 20000 --global
+                                    npm config set fetch-retry-maxtimeout 120000 --global
                                     npm ci --prefer-offline --no-audit
                                 '''
                             }
@@ -210,195 +226,205 @@ pipeline {
     post {
         success {
             script {
-                echo '========================================='
-                echo '  ✅ BUILD EXITOSO'
-                echo '========================================='
-                echo "Commit: ${env.GIT_COMMIT}"
-                echo "Branch: ${env.GIT_BRANCH}"
-                echo "Build: #${env.BUILD_NUMBER}"
+                node {
+                    // Checkout del código para acceder a git log
+                    checkout scm
 
-                // Obtener información adicional del commit
-                def commitAuthor = sh(script: 'git log -1 --pretty=format:"%an"', returnStdout: true).trim()
-                def commitMessage = sh(script: 'git log -1 --pretty=format:"%s"', returnStdout: true).trim()
-                def buildDuration = currentBuild.durationString.replace(' and counting', '')
-                def isDeployBranch = (env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop')
-                def deployStatus = isDeployBranch ? '✅ Merged a main\n🚀 Desplegando a Railway...' : 'ℹ️ Sin deploy (solo en develop)'
+                    echo '========================================='
+                    echo '  ✅ BUILD EXITOSO'
+                    echo '========================================='
+                    echo "Commit: ${env.GIT_COMMIT}"
+                    echo "Branch: ${env.GIT_BRANCH}"
+                    echo "Build: #${env.BUILD_NUMBER}"
 
-                // Notificación Discord - Build Exitoso
-                def discordMessage = """
-                {
-                    "embeds": [{
-                        "title": "✅ Build Exitoso",
-                        "description": "**${commitMessage}**",
-                        "color": 3066993,
-                        "author": {
-                            "name": "Sistema Gestión de Activos",
-                            "icon_url": "https://cdn-icons-png.flaticon.com/512/5610/5610944.png"
-                        },
-                        "thumbnail": {
-                            "url": "https://cdn-icons-png.flaticon.com/512/845/845646.png"
-                        },
-                        "fields": [
-                            {
-                                "name": "👤 Autor",
-                                "value": "${commitAuthor}",
-                                "inline": true
-                            },
-                            {
-                                "name": "🌿 Branch",
-                                "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
-                                "inline": true
-                            },
-                            {
-                                "name": "📋 Build",
-                                "value": "[#${env.BUILD_NUMBER}](${env.BUILD_URL})",
-                                "inline": true
-                            },
-                            {
-                                "name": "📝 Commit",
-                                "value": "[${env.GIT_COMMIT?.take(7)}](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
-                                "inline": true
-                            },
-                            {
-                                "name": "⏱️ Duración",
-                                "value": "${buildDuration}",
-                                "inline": true
-                            },
-                            {
-                                "name": "🧪 Tests",
-                                "value": "**28/28** pasaron ✅\n• 13 Tests Activos\n• 15 Tests Mantenimientos",
-                                "inline": true
-                            },
-                            {
-                                "name": "🚀 Deploy",
-                                "value": "${deployStatus}",
-                                "inline": false
-                            },
-                            {
-                                "name": "🔗 Enlaces",
-                                "value": "[Jenkins Console](${env.BUILD_URL}console) • [GitHub Repo](https://github.com/edwingd18/proyecto-final-cloud-computing)",
-                                "inline": false
-                            }
-                        ],
-                        "footer": {
-                            "text": "Jenkins CI/CD Pipeline",
-                            "icon_url": "https://www.jenkins.io/images/logos/jenkins/jenkins.png"
-                        },
-                        "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
-                    }]
-                }
-                """
+                    // Obtener información adicional del commit
+                    def commitAuthor = sh(script: 'git log -1 --pretty=format:"%an"', returnStdout: true).trim()
+                    def commitMessage = sh(script: 'git log -1 --pretty=format:"%s"', returnStdout: true).trim()
+                    def buildDuration = currentBuild.durationString.replace(' and counting', '')
+                    def isDeployBranch = (env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop')
+                    def deployStatus = isDeployBranch ? '✅ Merged a main\n🚀 Desplegando a Railway...' : 'ℹ️ Sin deploy (solo en develop)'
 
-                try {
-                    writeFile file: 'discord-payload.json', text: discordMessage
-                    withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
-                        writeFile file: 'send-discord.sh', text: '''#!/bin/bash
+                    // Notificación Discord - Build Exitoso
+                    def discordMessage = """
+                    {
+                        "embeds": [{
+                            "title": "✅ Build Exitoso",
+                            "description": "**${commitMessage}**",
+                            "color": 3066993,
+                            "author": {
+                                "name": "Sistema Gestión de Activos",
+                                "icon_url": "https://cdn-icons-png.flaticon.com/512/5610/5610944.png"
+                            },
+                            "thumbnail": {
+                                "url": "https://cdn-icons-png.flaticon.com/512/845/845646.png"
+                            },
+                            "fields": [
+                                {
+                                    "name": "👤 Autor",
+                                    "value": "${commitAuthor}",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "🌿 Branch",
+                                    "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "📋 Build",
+                                    "value": "[#${env.BUILD_NUMBER}](${env.BUILD_URL})",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "📝 Commit",
+                                    "value": "[${env.GIT_COMMIT?.take(7)}](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "⏱️ Duración",
+                                    "value": "${buildDuration}",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "🧪 Tests",
+                                    "value": "**28/28** pasaron ✅\n• 13 Tests Activos\n• 15 Tests Mantenimientos",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "🚀 Deploy",
+                                    "value": "${deployStatus}",
+                                    "inline": false
+                                },
+                                {
+                                    "name": "🔗 Enlaces",
+                                    "value": "[Jenkins Console](${env.BUILD_URL}console) • [GitHub Repo](https://github.com/edwingd18/proyecto-final-cloud-computing)",
+                                    "inline": false
+                                }
+                            ],
+                            "footer": {
+                                "text": "Jenkins CI/CD Pipeline",
+                                "icon_url": "https://www.jenkins.io/images/logos/jenkins/jenkins.png"
+                            },
+                            "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
+                        }]
+                    }
+                    """
+
+                    try {
+                        writeFile file: 'discord-payload.json', text: discordMessage
+                        withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
+                            writeFile file: 'send-discord.sh', text: '''#!/bin/bash
 curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payload.json
 '''
-                        sh 'chmod +x send-discord.sh && ./send-discord.sh'
+                            sh 'chmod +x send-discord.sh && ./send-discord.sh'
+                        }
+                    } catch (Exception e) {
+                        echo "No se pudo enviar notificación a Discord: ${e.message}"
                     }
-                } catch (Exception e) {
-                    echo "No se pudo enviar notificación a Discord: ${e.message}"
                 }
             }
         }
 
         failure {
             script {
-                echo '========================================='
-                echo '  ❌ BUILD FALLIDO'
-                echo '========================================='
-                echo "Commit: ${env.GIT_COMMIT}"
-                echo "Branch: ${env.GIT_BRANCH}"
-                echo "Build: #${env.BUILD_NUMBER}"
+                node {
+                    // Checkout del código para acceder a git log
+                    checkout scm
 
-                // Obtener información adicional del commit
-                def commitAuthor = sh(script: 'git log -1 --pretty=format:"%an"', returnStdout: true).trim()
-                def commitMessage = sh(script: 'git log -1 --pretty=format:"%s"', returnStdout: true).trim()
-                def buildDuration = currentBuild.durationString.replace(' and counting', '')
-                def failureStage = currentBuild.result ?: 'Unknown'
+                    echo '========================================='
+                    echo '  ❌ BUILD FALLIDO'
+                    echo '========================================='
+                    echo "Commit: ${env.GIT_COMMIT}"
+                    echo "Branch: ${env.GIT_BRANCH}"
+                    echo "Build: #${env.BUILD_NUMBER}"
 
-                // Notificación Discord - Build Fallido
-                def discordMessage = """
-                {
-                    "content": "@here ⚠️ **Build Fallido**",
-                    "embeds": [{
-                        "title": "❌ Build Fallido",
-                        "description": "**${commitMessage}**",
-                        "color": 15158332,
-                        "author": {
-                            "name": "Sistema Gestión de Activos",
-                            "icon_url": "https://cdn-icons-png.flaticon.com/512/5610/5610944.png"
-                        },
-                        "thumbnail": {
-                            "url": "https://cdn-icons-png.flaticon.com/512/1828/1828665.png"
-                        },
-                        "fields": [
-                            {
-                                "name": "👤 Autor",
-                                "value": "${commitAuthor}",
-                                "inline": true
-                            },
-                            {
-                                "name": "🌿 Branch",
-                                "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
-                                "inline": true
-                            },
-                            {
-                                "name": "📋 Build",
-                                "value": "[#${env.BUILD_NUMBER}](${env.BUILD_URL})",
-                                "inline": true
-                            },
-                            {
-                                "name": "📝 Commit",
-                                "value": "[${env.GIT_COMMIT?.take(7)}](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
-                                "inline": true
-                            },
-                            {
-                                "name": "⏱️ Duración",
-                                "value": "${buildDuration}",
-                                "inline": true
-                            },
-                            {
-                                "name": "❌ Estado",
-                                "value": "**${failureStage}**",
-                                "inline": true
-                            },
-                            {
-                                "name": "🚫 Deploy",
-                                "value": "⛔ **NO se hizo merge a main**\n🔒 Producción protegida",
-                                "inline": false
-                            },
-                            {
-                                "name": "📊 Acción Requerida",
-                                "value": "• Revisa los logs del build\n• Corrige los errores\n• Haz push y ejecuta de nuevo",
-                                "inline": false
-                            },
-                            {
-                                "name": "🔗 Enlaces",
-                                "value": "[📋 Ver Logs Completos](${env.BUILD_URL}console) • [🔧 Ver Tests](${env.BUILD_URL}testReport) • [💻 GitHub](https://github.com/edwingd18/proyecto-final-cloud-computing)",
-                                "inline": false
-                            }
-                        ],
-                        "footer": {
-                            "text": "Jenkins CI/CD Pipeline - ⚠️ Requiere Atención",
-                            "icon_url": "https://www.jenkins.io/images/logos/jenkins/jenkins.png"
-                        },
-                        "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
-                    }]
-                }
-                """
+                    // Obtener información adicional del commit
+                    def commitAuthor = sh(script: 'git log -1 --pretty=format:"%an"', returnStdout: true).trim()
+                    def commitMessage = sh(script: 'git log -1 --pretty=format:"%s"', returnStdout: true).trim()
+                    def buildDuration = currentBuild.durationString.replace(' and counting', '')
+                    def failureStage = currentBuild.result ?: 'Unknown'
 
-                try {
-                    writeFile file: 'discord-payload.json', text: discordMessage
-                    withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
-                        writeFile file: 'send-discord.sh', text: '''#!/bin/bash
+                    // Notificación Discord - Build Fallido
+                    def discordMessage = """
+                    {
+                        "content": "@here ⚠️ **Build Fallido**",
+                        "embeds": [{
+                            "title": "❌ Build Fallido",
+                            "description": "**${commitMessage}**",
+                            "color": 15158332,
+                            "author": {
+                                "name": "Sistema Gestión de Activos",
+                                "icon_url": "https://cdn-icons-png.flaticon.com/512/5610/5610944.png"
+                            },
+                            "thumbnail": {
+                                "url": "https://cdn-icons-png.flaticon.com/512/1828/1828665.png"
+                            },
+                            "fields": [
+                                {
+                                    "name": "👤 Autor",
+                                    "value": "${commitAuthor}",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "🌿 Branch",
+                                    "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "📋 Build",
+                                    "value": "[#${env.BUILD_NUMBER}](${env.BUILD_URL})",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "📝 Commit",
+                                    "value": "[${env.GIT_COMMIT?.take(7)}](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "⏱️ Duración",
+                                    "value": "${buildDuration}",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "❌ Estado",
+                                    "value": "**${failureStage}**",
+                                    "inline": true
+                                },
+                                {
+                                    "name": "🚫 Deploy",
+                                    "value": "⛔ **NO se hizo merge a main**\n🔒 Producción protegida",
+                                    "inline": false
+                                },
+                                {
+                                    "name": "📊 Acción Requerida",
+                                    "value": "• Revisa los logs del build\n• Corrige los errores\n• Haz push y ejecuta de nuevo",
+                                    "inline": false
+                                },
+                                {
+                                    "name": "🔗 Enlaces",
+                                    "value": "[📋 Ver Logs Completos](${env.BUILD_URL}console) • [🔧 Ver Tests](${env.BUILD_URL}testReport) • [💻 GitHub](https://github.com/edwingd18/proyecto-final-cloud-computing)",
+                                    "inline": false
+                                }
+                            ],
+                            "footer": {
+                                "text": "Jenkins CI/CD Pipeline - ⚠️ Requiere Atención",
+                                "icon_url": "https://www.jenkins.io/images/logos/jenkins/jenkins.png"
+                            },
+                            "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
+                        }]
+                    }
+                    """
+
+                    try {
+                        writeFile file: 'discord-payload.json', text: discordMessage
+                        withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
+                            writeFile file: 'send-discord.sh', text: '''#!/bin/bash
 curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payload.json
 '''
-                        sh 'chmod +x send-discord.sh && ./send-discord.sh'
+                            sh 'chmod +x send-discord.sh && ./send-discord.sh'
+                        }
+                    } catch (Exception e) {
+                        echo "No se pudo enviar notificación a Discord: ${e.message}"
                     }
-                } catch (Exception e) {
-                    echo "No se pudo enviar notificación a Discord: ${e.message}"
                 }
             }
         }
