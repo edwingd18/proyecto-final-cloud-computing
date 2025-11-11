@@ -266,7 +266,7 @@ pipeline {
                                 },
                                 {
                                     "name": " Branch",
-                                    "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
+                                    "value": "`${env.GIT_BRANCH?.replace('origin/', '') ?: 'unknown'}`",
                                     "inline": true
                                 },
                                 {
@@ -366,7 +366,7 @@ curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payl
                                 },
                                 {
                                     "name": " Branch",
-                                    "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
+                                    "value": "`${env.GIT_BRANCH?.replace('origin/', '') ?: 'unknown'}`",
                                     "inline": true
                                 },
                                 {
