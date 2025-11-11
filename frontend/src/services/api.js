@@ -1,8 +1,9 @@
 import axios from "axios";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://api-gateway-production-2e6e.up.railway.app/api";
+// Configuración de API URL
+// En desarrollo: usar API Gateway local
+// En producción: usar variable de entorno o servicio directo
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 const api = axios.create({
   baseURL: API_URL.replace(/\/$/, ""), // Eliminar trailing slash si existe
