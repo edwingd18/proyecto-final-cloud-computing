@@ -8,6 +8,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configurar para evitar redirects automáticos por trailing slash
+app.enable('strict routing'); // Trata /api/activos y /api/activos/ como diferentes
+
 // Configuración de rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
@@ -24,6 +27,7 @@ app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev'));
 app.use(limiter);
+
 
 // Health check del gateway
 app.get('/health', (req, res) => {
@@ -101,7 +105,7 @@ const mantenimientosProxy = createProxyMiddleware({
   }
 });
 
-// Rutas del gateway
+// Rutas del gateway - Orden importante: sin slash primero
 app.use('/api/activos', activosProxy);
 app.use('/api/mantenimientos', mantenimientosProxy);
 
