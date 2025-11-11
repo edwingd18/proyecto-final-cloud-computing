@@ -2,14 +2,15 @@ import axios from "axios";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://api-gateway-production-7894.up.railway.app/api";
+  "https://api-gateway-production-2e6e.up.railway.app/api";
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_URL.replace(/\/$/, ""), // Eliminar trailing slash si existe
   headers: {
     "Content-Type": "application/json",
   },
   timeout: 10000,
+  maxRedirects: 0, // Evitar seguir redirects automáticamente
 });
 
 // Interceptor para agregar token si existe (futuro)
