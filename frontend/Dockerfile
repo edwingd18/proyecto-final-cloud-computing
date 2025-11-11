@@ -14,7 +14,8 @@ RUN npm install
 COPY . .
 
 # ARG: Recibe el valor desde docker-compose o usa el valor por defecto (Railway)
-ARG NEXT_PUBLIC_API_URL=https://api-gateway-production-2e6e.up.railway.app/api
+# Usar directamente el servicio de activos para evitar problemas de redirect
+ARG NEXT_PUBLIC_API_URL=https://servicio-activos-production.up.railway.app
 
 # Variables de entorno
 ENV NODE_ENV=production
