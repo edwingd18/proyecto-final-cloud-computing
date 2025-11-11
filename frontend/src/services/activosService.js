@@ -17,7 +17,7 @@ export const activosService = {
 
   // Crear un nuevo activo
   create: async (data) => {
-    const response = await api.post(`${ACTIVOS_ENDPOINT}/crear`, data);
+    const response = await api.post(`${ACTIVOS_ENDPOINT}/nuevo`, data);
     return response.data;
   },
 
