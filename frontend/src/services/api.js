@@ -1,11 +1,9 @@
 import axios from "axios";
 
-// En producción usar directamente los servicios, en desarrollo usar el gateway
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production"
-    ? "https://servicio-activos-production.up.railway.app"
-    : "http://localhost:3000/api");
+// Configuración de API URL
+// En desarrollo: usar API Gateway local
+// En producción: usar variable de entorno o servicio directo
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 const api = axios.create({
   baseURL: API_URL.replace(/\/$/, ""), // Eliminar trailing slash si existe

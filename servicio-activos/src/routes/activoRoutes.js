@@ -53,21 +53,16 @@ const activoValidation = [
     .withMessage("Estado no válido"),
 ];
 
-// Rutas - Orden CRÍTICO: rutas específicas ANTES de /:id
-// GET all primero
-router.get("/", activoController.getAllActivos);
+// Rutas con prefijos explícitos para evitar conflictos
+// Listar y buscar
+router.get("/lista", activoController.getAllActivos);
+router.get("/buscar", activoController.searchActivos);
+router.get("/stats", activoController.getEstadisticas);
 
-// Rutas específicas
-router.get("/search", activoController.searchActivos);
-router.get("/estadisticas", activoController.getEstadisticas);
-
-// POST - Usar ruta específica /nuevo para evitar conflictos
-router.post("/nuevo", activoValidation, activoController.createActivo);
-router.post("/", activoValidation, activoController.createActivo);
-
-// Rutas con parámetros UUID al FINAL (para que no capturen /nuevo, /search, etc)
-router.put("/:id", activoValidation, activoController.updateActivo);
-router.delete("/:id", activoController.deleteActivo);
-router.get("/:id", activoController.getActivoById);
+// CRUD con prefijos claros
+router.post("/crear", activoValidation, activoController.createActivo);
+router.get("/ver/:id", activoController.getActivoById);
+router.put("/actualizar/:id", activoValidation, activoController.updateActivo);
+router.delete("/eliminar/:id", activoController.deleteActivo);
 
 module.exports = router;
