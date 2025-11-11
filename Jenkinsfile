@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     echo '========================================='
-                    echo '  🔍 CHECKOUT: Obteniendo código fuente'
+                    echo '  CHECKOUT: Obteniendo código fuente'
                     echo '========================================='
                 }
                 checkout scm
@@ -28,7 +28,7 @@ pipeline {
         stage('Setup Cache') {
             steps {
                 script {
-                    echo '🗄️ Configurando cache de npm...'
+                    echo ' Configurando cache de npm...'
                     // Crear directorio de cache si no existe
                     sh '''
                         mkdir -p $HOME/.npm-cache
@@ -45,7 +45,7 @@ pipeline {
                     steps {
                         timeout(time: 15, unit: 'MINUTES') {
                             script {
-                                echo '📦 Instalando dependencias - Frontend (Next.js)'
+                                echo ' Instalando dependencias - Frontend (Next.js)'
                             }
                             dir('frontend') {
                                 sh '''
@@ -64,7 +64,7 @@ pipeline {
                     steps {
                         timeout(time: 10, unit: 'MINUTES') {
                             script {
-                                echo '📦 Instalando dependencias - Servicio Activos'
+                                echo ' Instalando dependencias - Servicio Activos'
                             }
                             dir('servicio-activos') {
                                 sh '''
@@ -88,7 +88,7 @@ pipeline {
                     steps {
                         timeout(time: 10, unit: 'MINUTES') {
                             script {
-                                echo '📦 Instalando dependencias - Servicio Mantenimientos'
+                                echo ' Instalando dependencias - Servicio Mantenimientos'
                             }
                             dir('servicio-mantenimientos') {
                                 sh '''
@@ -107,7 +107,7 @@ pipeline {
                     steps {
                         timeout(time: 10, unit: 'MINUTES') {
                             script {
-                                echo '📦 Instalando dependencias - API Gateway'
+                                echo ' Instalando dependencias - API Gateway'
                             }
                             dir('api-gateway') {
                                 sh '''
@@ -130,7 +130,7 @@ pipeline {
                 stage('Test Activos') {
                     steps {
                         script {
-                            echo '🧪 Ejecutando tests - Servicio Activos'
+                            echo ' Ejecutando tests - Servicio Activos'
                         }
                         dir('servicio-activos') {
                             // Configurar variables de entorno para tests
@@ -154,7 +154,7 @@ pipeline {
                 stage('Test Mantenimientos') {
                     steps {
                         script {
-                            echo '🧪 Ejecutando tests - Servicio Mantenimientos'
+                            echo ' Ejecutando tests - Servicio Mantenimientos'
                         }
                         dir('servicio-mantenimientos') {
                             // Configurar variables de entorno para tests
@@ -181,10 +181,10 @@ pipeline {
             steps {
                 script {
                     echo '========================================='
-                    echo '  🚀 DEPLOY: Tests pasaron - Desplegando a producción'
+                    echo '   DEPLOY: Tests pasaron - Desplegando a producción'
                     echo '========================================='
-                    echo '✅ Todos los tests pasaron correctamente'
-                    echo '📦 Haciendo merge de develop a main...'
+                    echo ' Todos los tests pasaron correctamente'
+                    echo ' Haciendo merge de develop a main...'
                 }
 
                 withCredentials([usernamePassword(
@@ -215,9 +215,9 @@ pipeline {
                 }
 
                 script {
-                    echo '✅ Merge completado exitosamente'
-                    echo '🚀 Railway detectará el cambio en main y desplegará automáticamente'
-                    echo '📊 Verifica el progreso en: https://railway.app/dashboard'
+                    echo ' Merge completado exitosamente'
+                    echo ' Railway detectará el cambio en main y desplegará automáticamente'
+                    echo ' Verifica el progreso en: https://railway.app/dashboard'
                 }
             }
         }
@@ -231,7 +231,7 @@ pipeline {
                     checkout scm
 
                     echo '========================================='
-                    echo '  ✅ BUILD EXITOSO'
+                    echo '   BUILD EXITOSO'
                     echo '========================================='
                     echo "Commit: ${env.GIT_COMMIT}"
                     echo "Branch: ${env.GIT_BRANCH}"
@@ -242,13 +242,13 @@ pipeline {
                     def commitMessage = sh(script: 'git log -1 --pretty=format:"%s"', returnStdout: true).trim()
                     def buildDuration = currentBuild.durationString.replace(' and counting', '')
                     def isDeployBranch = (env.GIT_BRANCH == 'origin/develop' || env.GIT_BRANCH == 'develop')
-                    def deployStatus = isDeployBranch ? '✅ Merged a main\n🚀 Desplegando a Railway...' : 'ℹ️ Sin deploy (solo en develop)'
+                    def deployStatus = isDeployBranch ? ' Merged a main\nx Desplegando a Railway...' : ' Sin deploy (solo en develop)'
 
                     // Notificación Discord - Build Exitoso
                     def discordMessage = """
                     {
                         "embeds": [{
-                            "title": "✅ Build Exitoso",
+                            "title": " Build Exitoso",
                             "description": "**${commitMessage}**",
                             "color": 3066993,
                             "author": {
@@ -260,42 +260,42 @@ pipeline {
                             },
                             "fields": [
                                 {
-                                    "name": "👤 Autor",
+                                    "name": " Autor",
                                     "value": "${commitAuthor}",
                                     "inline": true
                                 },
                                 {
-                                    "name": "🌿 Branch",
+                                    "name": " Branch",
                                     "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
                                     "inline": true
                                 },
                                 {
-                                    "name": "📋 Build",
+                                    "name": " Build",
                                     "value": "[#${env.BUILD_NUMBER}](${env.BUILD_URL})",
                                     "inline": true
                                 },
                                 {
-                                    "name": "📝 Commit",
+                                    "name": " Commit",
                                     "value": "[${env.GIT_COMMIT?.take(7)}](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
                                     "inline": true
                                 },
                                 {
-                                    "name": "⏱️ Duración",
+                                    "name": " Duración",
                                     "value": "${buildDuration}",
                                     "inline": true
                                 },
                                 {
-                                    "name": "🧪 Tests",
-                                    "value": "**28/28** pasaron ✅\n• 13 Tests Activos\n• 15 Tests Mantenimientos",
+                                    "name": " Tests",
+                                    "value": "**28/28** pasaron \n• 13 Tests Activos\n• 15 Tests Mantenimientos",
                                     "inline": true
                                 },
                                 {
-                                    "name": "🚀 Deploy",
+                                    "name": " Deploy",
                                     "value": "${deployStatus}",
                                     "inline": false
                                 },
                                 {
-                                    "name": "🔗 Enlaces",
+                                    "name": " Enlaces",
                                     "value": "[Jenkins Console](${env.BUILD_URL}console) • [GitHub Repo](https://github.com/edwingd18/proyecto-final-cloud-computing)",
                                     "inline": false
                                 }
@@ -331,7 +331,7 @@ curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payl
                     checkout scm
 
                     echo '========================================='
-                    echo '  ❌ BUILD FALLIDO'
+                    echo '   BUILD FALLIDO'
                     echo '========================================='
                     echo "Commit: ${env.GIT_COMMIT}"
                     echo "Branch: ${env.GIT_BRANCH}"
@@ -346,9 +346,9 @@ curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payl
                     // Notificación Discord - Build Fallido
                     def discordMessage = """
                     {
-                        "content": "@here ⚠️ **Build Fallido**",
+                        "content": "@here  **Build Fallido**",
                         "embeds": [{
-                            "title": "❌ Build Fallido",
+                            "title": " Build Fallido",
                             "description": "**${commitMessage}**",
                             "color": 15158332,
                             "author": {
@@ -360,53 +360,53 @@ curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payl
                             },
                             "fields": [
                                 {
-                                    "name": "👤 Autor",
+                                    "name": " Autor",
                                     "value": "${commitAuthor}",
                                     "inline": true
                                 },
                                 {
-                                    "name": "🌿 Branch",
+                                    "name": " Branch",
                                     "value": "`${env.GIT_BRANCH.replace('origin/', '')}`",
                                     "inline": true
                                 },
                                 {
-                                    "name": "📋 Build",
+                                    "name": " Build",
                                     "value": "[#${env.BUILD_NUMBER}](${env.BUILD_URL})",
                                     "inline": true
                                 },
                                 {
-                                    "name": "📝 Commit",
+                                    "name": " Commit",
                                     "value": "[${env.GIT_COMMIT?.take(7)}](https://github.com/edwingd18/proyecto-final-cloud-computing/commit/${env.GIT_COMMIT})",
                                     "inline": true
                                 },
                                 {
-                                    "name": "⏱️ Duración",
+                                    "name": " Duración",
                                     "value": "${buildDuration}",
                                     "inline": true
                                 },
                                 {
-                                    "name": "❌ Estado",
+                                    "name": " Estado",
                                     "value": "**${failureStage}**",
                                     "inline": true
                                 },
                                 {
-                                    "name": "🚫 Deploy",
-                                    "value": "⛔ **NO se hizo merge a main**\n🔒 Producción protegida",
+                                    "name": " Deploy",
+                                    "value": " **NO se hizo merge a main**\n Producción protegida",
                                     "inline": false
                                 },
                                 {
-                                    "name": "📊 Acción Requerida",
+                                    "name": " Acción Requerida",
                                     "value": "• Revisa los logs del build\n• Corrige los errores\n• Haz push y ejecuta de nuevo",
                                     "inline": false
                                 },
                                 {
-                                    "name": "🔗 Enlaces",
-                                    "value": "[📋 Ver Logs Completos](${env.BUILD_URL}console) • [🔧 Ver Tests](${env.BUILD_URL}testReport) • [💻 GitHub](https://github.com/edwingd18/proyecto-final-cloud-computing)",
+                                    "name": " Enlaces",
+                                    "value": "[ Ver Logs Completos](${env.BUILD_URL}console) • [🔧 Ver Tests](${env.BUILD_URL}testReport) • [💻 GitHub](https://github.com/edwingd18/proyecto-final-cloud-computing)",
                                     "inline": false
                                 }
                             ],
                             "footer": {
-                                "text": "Jenkins CI/CD Pipeline - ⚠️ Requiere Atención",
+                                "text": "Jenkins CI/CD Pipeline -  Requiere Atención",
                                 "icon_url": "https://www.jenkins.io/images/logos/jenkins/jenkins.png"
                             },
                             "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))}"
@@ -435,11 +435,6 @@ curl -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d @discord-payl
                 echo '  Pipeline finalizado'
                 echo '========================================='
             }
-            // Nota: cleanWs comentado temporalmente para evitar errores
-            // cleanWs(
-            //     deleteDirs: true,
-            //     patterns: [[pattern: 'node_modules/**', type: 'INCLUDE']]
-            // )
         }
     }
 }
