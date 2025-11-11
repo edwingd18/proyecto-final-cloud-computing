@@ -1,6 +1,6 @@
-import api from './api';
+import api from "./api";
 
-const ACTIVOS_ENDPOINT = '/activos';
+const ACTIVOS_ENDPOINT = "/activos";
 
 export const activosService = {
   // Obtener todos los activos No
@@ -17,7 +17,7 @@ export const activosService = {
 
   // Crear un nuevo activo
   create: async (data) => {
-    const response = await api.post(ACTIVOS_ENDPOINT, data);
+    const response = await api.post(`${ACTIVOS_ENDPOINT}/crear`, data);
     return response.data;
   },
 
@@ -36,7 +36,7 @@ export const activosService = {
   // Buscar activos
   search: async (query) => {
     const response = await api.get(`${ACTIVOS_ENDPOINT}/search`, {
-      params: { q: query }
+      params: { q: query },
     });
     return response.data;
   },
@@ -45,5 +45,5 @@ export const activosService = {
   getEstadisticas: async () => {
     const response = await api.get(`${ACTIVOS_ENDPOINT}/estadisticas`);
     return response.data;
-  }
+  },
 };
