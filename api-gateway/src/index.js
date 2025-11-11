@@ -8,6 +8,9 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Habilitar trust proxy para Railway (necesario para rate limiting y proxies)
+app.set("trust proxy", 1);
+
 // DESHABILITAR strict routing para que /api/activos y /api/activos/ sean iguales
 app.disable("strict routing");
 
