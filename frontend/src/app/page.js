@@ -96,7 +96,7 @@ export default function Dashboard() {
           boxShadow="2xl"
         >
           <Heading size="2xl" color="white" mb={3} textAlign="center">
-            Cambio a produccion desde develop
+            Cambio a produccion desde develop1
           </Heading>
           <Text
             fontSize="xl"
