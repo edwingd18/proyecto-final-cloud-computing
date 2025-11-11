@@ -20,6 +20,8 @@ const limiter = rateLimit({
 
 // Middleware global
 app.use(cors());
+app.use(express.json()); // Parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev'));
 app.use(limiter);
 
