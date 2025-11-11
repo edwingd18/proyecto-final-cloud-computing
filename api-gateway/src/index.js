@@ -148,13 +148,13 @@ app.get("/", (req, res) => {
       activos: {
         base: "/api/activos",
         endpoints: [
-          "GET /api/activos - Listar todos los activos",
-          "GET /api/activos/:id - Obtener un activo",
-          "GET /api/activos/search?q= - Buscar activos",
-          "GET /api/activos/estadisticas - Estadísticas",
-          "POST /api/activos - Crear activo",
-          "PUT /api/activos/:id - Actualizar activo",
-          "DELETE /api/activos/:id - Eliminar activo",
+          "GET /api/activos/lista - Listar todos los activos",
+          "GET /api/activos/ver/:id - Obtener un activo",
+          "GET /api/activos/buscar?q= - Buscar activos",
+          "GET /api/activos/stats - Estadísticas",
+          "POST /api/activos/crear - Crear activo",
+          "PUT /api/activos/actualizar/:id - Actualizar activo",
+          "DELETE /api/activos/eliminar/:id - Eliminar activo",
         ],
       },
       mantenimientos: {
