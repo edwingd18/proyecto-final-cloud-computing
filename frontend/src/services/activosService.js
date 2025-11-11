@@ -3,7 +3,7 @@ import api from './api';
 const ACTIVOS_ENDPOINT = '/activos';
 
 export const activosService = {
-  // Obtener todos los activos
+  // Obtener todos los activos No
   getAll: async (params = {}) => {
     const response = await api.get(ACTIVOS_ENDPOINT, { params });
     return response.data;
