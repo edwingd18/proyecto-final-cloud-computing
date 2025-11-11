@@ -151,8 +151,16 @@ const mantenimientosProxy = createProxyMiddleware({
   },
   onProxyReq: (proxyReq, req, res) => {
     console.log(
-      `[Mantenimientos] ${req.method} ${req.path} -> ${process.env.MANTENIMIENTOS_SERVICE_URL}${req.path}`
+      `[Mantenimientos] ${req.method} ${req.originalUrl} -> ${proxyReq.method} ${proxyReq.path}`
     );
+
+    // Asegurar que el Content-Type y body se preserven en POST/PUT
+    if (req.body && Object.keys(req.body).length > 0) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader("Content-Type", "application/json");
+      proxyReq.setHeader("Content-Length", Buffer.byteLength(bodyData));
+      proxyReq.write(bodyData);
+    }
   },
 });
 
