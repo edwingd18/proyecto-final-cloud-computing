@@ -87,7 +87,7 @@ export default function Dashboard() {
   return (
     <Layout>
       <Box>
-        {/* Banner destacado con gradiente descendiente */}
+        {/* Banner destacado con gradiente descete */}
         <Box
           bgGradient="linear(to-r, teal.500, blue.500, purple.600)"
           p={8}
