@@ -96,7 +96,7 @@ export default function Dashboard() {
           boxShadow="2xl"
         >
           <Heading size="2xl" color="white" mb={3} textAlign="center">
-            Prueba de deploy automatico
+            Prueba de deploy automatico!!!
           </Heading>
           <Text
             fontSize="xl"
