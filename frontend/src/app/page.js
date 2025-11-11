@@ -10,7 +10,6 @@ import {
   StatHelpText,
   Card,
   CardBody,
-  Heading,
   Spinner,
   Center,
   Text,
