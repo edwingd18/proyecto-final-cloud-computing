@@ -50,6 +50,21 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Debug endpoint para verificar configuración
+app.get("/debug/config", (req, res) => {
+  res.json({
+    service: "api-gateway",
+    environment: process.env.NODE_ENV,
+    port: process.env.PORT,
+    services: {
+      activos: process.env.ACTIVOS_SERVICE_URL || "NOT CONFIGURED",
+      mantenimientos:
+        process.env.MANTENIMIENTOS_SERVICE_URL || "NOT CONFIGURED",
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Health check de todos los servicios
 app.get("/health/all", async (req, res) => {
   const services = {
