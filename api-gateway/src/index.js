@@ -96,8 +96,13 @@ app.get("/health/all", async (req, res) => {
 
 // Configuración del proxy para el servicio de activos
 const activosProxy = createProxyMiddleware({
-  target: process.env.ACTIVOS_SERVICE_URL || "http://localhost:3001",
+  target:
+    process.env.ACTIVOS_SERVICE_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "https://servicio-activos-production.up.railway.app"
+      : "http://localhost:3001"),
   changeOrigin: true,
+  secure: true,
   pathRewrite: {
     "^/api/activos": "/activos",
   },
@@ -126,8 +131,13 @@ const activosProxy = createProxyMiddleware({
 
 // Configuración del proxy para el servicio de mantenimientos
 const mantenimientosProxy = createProxyMiddleware({
-  target: process.env.MANTENIMIENTOS_SERVICE_URL || "http://localhost:3002",
+  target:
+    process.env.MANTENIMIENTOS_SERVICE_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "https://servicio-mantenimientos-production.up.railway.app"
+      : "http://localhost:3002"),
   changeOrigin: true,
+  secure: true,
   pathRewrite: {
     "^/api/mantenimientos": "/mantenimientos",
   },
@@ -178,14 +188,14 @@ app.get("/", (req, res) => {
       mantenimientos: {
         base: "/api/mantenimientos",
         endpoints: [
-          "GET /api/mantenimientos - Listar todos los mantenimientos",
-          "GET /api/mantenimientos/:id - Obtener un mantenimiento",
-          "GET /api/mantenimientos/activo/:activoId - Mantenimientos por activo",
-          "GET /api/mantenimientos/estadisticas - Estadísticas",
-          "POST /api/mantenimientos - Crear mantenimiento",
-          "PUT /api/mantenimientos/:id - Actualizar mantenimiento",
-          "PATCH /api/mantenimientos/:id/estado - Cambiar estado",
-          "POST /api/mantenimientos/:id/notas - Agregar nota",
+          "GET /api/mantenimientos/lista - Listar todos los mantenimientos",
+          "GET /api/mantenimientos/ver/:id - Obtener un mantenimiento",
+          "GET /api/mantenimientos/por-activo/:activoId - Mantenimientos por activo",
+          "GET /api/mantenimientos/stats - Estadísticas",
+          "POST /api/mantenimientos/crear - Crear mantenimiento",
+          "PUT /api/mantenimientos/actualizar/:id - Actualizar mantenimiento",
+          "PATCH /api/mantenimientos/cambiar-estado/:id - Cambiar estado",
+          "POST /api/mantenimientos/agregar-nota/:id - Agregar nota",
           "DELETE /api/mantenimientos/:id - Eliminar mantenimiento",
         ],
       },

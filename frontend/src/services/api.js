@@ -1,8 +1,6 @@
 import axios from "axios";
 
-// Configuración de API URL
-// En desarrollo: usar API Gateway local
-// En producción: usar variable de entorno o servicio directo
+// Configuración de API URL - Siempre usar API Gateway
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 const api = axios.create({
