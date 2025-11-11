@@ -1,10 +1,17 @@
-const { validationResult } = require('express-validator');
-const Mantenimiento = require('../models/Mantenimiento');
+const { validationResult } = require("express-validator");
+const Mantenimiento = require("../models/Mantenimiento");
 
 // Obtener todos los mantenimientos con filtros
 exports.getAllMantenimientos = async (req, res) => {
   try {
-    const { page = 1, limit = 10, tipo, estado, prioridad, activoId } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      tipo,
+      estado,
+      prioridad,
+      activoId,
+    } = req.query;
     const skip = (page - 1) * limit;
 
     const filter = {};
@@ -27,15 +34,15 @@ exports.getAllMantenimientos = async (req, res) => {
         total,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
-    console.error('Error al obtener mantenimientos:', error);
+    console.error("Error al obtener mantenimientos:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener mantenimientos',
-      error: error.message
+      message: "Error al obtener mantenimientos",
+      error: error.message,
     });
   }
 };
@@ -49,28 +56,28 @@ exports.getMantenimientoById = async (req, res) => {
     if (!mantenimiento) {
       return res.status(404).json({
         success: false,
-        message: 'Mantenimiento no encontrado'
+        message: "Mantenimiento no encontrado",
       });
     }
 
     res.json({
       success: true,
-      data: mantenimiento
+      data: mantenimiento,
     });
   } catch (error) {
-    console.error('Error al obtener mantenimiento:', error);
+    console.error("Error al obtener mantenimiento:", error);
 
-    if (error.kind === 'ObjectId') {
+    if (error.kind === "ObjectId") {
       return res.status(400).json({
         success: false,
-        message: 'ID de mantenimiento inválido'
+        message: "ID de mantenimiento inválido",
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Error al obtener mantenimiento',
-      error: error.message
+      message: "Error al obtener mantenimiento",
+      error: error.message,
     });
   }
 };
@@ -79,20 +86,21 @@ exports.getMantenimientoById = async (req, res) => {
 exports.getMantenimientosByActivo = async (req, res) => {
   try {
     const { activoId } = req.params;
-    const mantenimientos = await Mantenimiento.find({ activoId })
-      .sort({ fecha_inicio: -1 });
+    const mantenimientos = await Mantenimiento.find({ activoId }).sort({
+      fecha_inicio: -1,
+    });
 
     res.json({
       success: true,
       data: mantenimientos,
-      count: mantenimientos.length
+      count: mantenimientos.length,
     });
   } catch (error) {
-    console.error('Error al obtener mantenimientos del activo:', error);
+    console.error("Error al obtener mantenimientos del activo:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener mantenimientos del activo',
-      error: error.message
+      message: "Error al obtener mantenimientos del activo",
+      error: error.message,
     });
   }
 };
@@ -104,7 +112,7 @@ exports.createMantenimiento = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
@@ -113,29 +121,29 @@ exports.createMantenimiento = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Mantenimiento creado exitosamente',
-      data: mantenimiento
+      message: "Mantenimiento creado exitosamente",
+      data: mantenimiento,
     });
   } catch (error) {
-    console.error('Error al crear mantenimiento:', error);
+    console.error("Error al crear mantenimiento:", error);
 
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => ({
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((err) => ({
         field: err.path,
-        message: err.message
+        message: err.message,
       }));
 
       return res.status(400).json({
         success: false,
-        message: 'Error de validación',
-        errors
+        message: "Error de validación",
+        errors,
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Error al crear mantenimiento',
-      error: error.message
+      message: "Error al crear mantenimiento",
+      error: error.message,
     });
   }
 };
@@ -147,56 +155,80 @@ exports.updateMantenimiento = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
     const { id } = req.params;
-    const mantenimiento = await Mantenimiento.findByIdAndUpdate(
-      id,
-      req.body,
-      { new: true, runValidators: true }
-    );
 
-    if (!mantenimiento) {
+    // Validación manual de fechas
+    if (req.body.fecha_fin && req.body.fecha_inicio) {
+      const fechaInicio = new Date(req.body.fecha_inicio);
+      const fechaFin = new Date(req.body.fecha_fin);
+
+      if (fechaFin < fechaInicio) {
+        return res.status(400).json({
+          success: false,
+          message: "Error de validación",
+          errors: [
+            {
+              field: "fecha_fin",
+              message:
+                "La fecha de fin debe ser posterior o igual a la fecha de inicio",
+            },
+          ],
+        });
+      }
+    }
+
+    // Buscar el mantenimiento existente
+    const mantenimientoExistente = await Mantenimiento.findById(id);
+
+    if (!mantenimientoExistente) {
       return res.status(404).json({
         success: false,
-        message: 'Mantenimiento no encontrado'
+        message: "Mantenimiento no encontrado",
       });
     }
+
+    // Actualizar campos
+    Object.assign(mantenimientoExistente, req.body);
+
+    // Guardar con validaciones
+    await mantenimientoExistente.save();
 
     res.json({
       success: true,
-      message: 'Mantenimiento actualizado exitosamente',
-      data: mantenimiento
+      message: "Mantenimiento actualizado exitosamente",
+      data: mantenimientoExistente,
     });
   } catch (error) {
-    console.error('Error al actualizar mantenimiento:', error);
+    console.error("Error al actualizar mantenimiento:", error);
 
-    if (error.kind === 'ObjectId') {
+    if (error.kind === "ObjectId") {
       return res.status(400).json({
         success: false,
-        message: 'ID de mantenimiento inválido'
+        message: "ID de mantenimiento inválido",
       });
     }
 
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => ({
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((err) => ({
         field: err.path,
-        message: err.message
+        message: err.message,
       }));
 
       return res.status(400).json({
         success: false,
-        message: 'Error de validación',
-        errors
+        message: "Error de validación",
+        errors,
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Error al actualizar mantenimiento',
-      error: error.message
+      message: "Error al actualizar mantenimiento",
+      error: error.message,
     });
   }
 };
@@ -210,28 +242,28 @@ exports.deleteMantenimiento = async (req, res) => {
     if (!mantenimiento) {
       return res.status(404).json({
         success: false,
-        message: 'Mantenimiento no encontrado'
+        message: "Mantenimiento no encontrado",
       });
     }
 
     res.json({
       success: true,
-      message: 'Mantenimiento eliminado exitosamente'
+      message: "Mantenimiento eliminado exitosamente",
     });
   } catch (error) {
-    console.error('Error al eliminar mantenimiento:', error);
+    console.error("Error al eliminar mantenimiento:", error);
 
-    if (error.kind === 'ObjectId') {
+    if (error.kind === "ObjectId") {
       return res.status(400).json({
         success: false,
-        message: 'ID de mantenimiento inválido'
+        message: "ID de mantenimiento inválido",
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Error al eliminar mantenimiento',
-      error: error.message
+      message: "Error al eliminar mantenimiento",
+      error: error.message,
     });
   }
 };
@@ -240,12 +272,12 @@ exports.deleteMantenimiento = async (req, res) => {
 exports.cambiarEstado = async (req, res) => {
   try {
     const { id } = req.params;
-    const { estado, usuario = 'Sistema' } = req.body;
+    const { estado, usuario = "Sistema" } = req.body;
 
     if (!estado) {
       return res.status(400).json({
         success: false,
-        message: 'El estado es requerido'
+        message: "El estado es requerido",
       });
     }
 
@@ -254,7 +286,7 @@ exports.cambiarEstado = async (req, res) => {
     if (!mantenimiento) {
       return res.status(404).json({
         success: false,
-        message: 'Mantenimiento no encontrado'
+        message: "Mantenimiento no encontrado",
       });
     }
 
@@ -262,23 +294,23 @@ exports.cambiarEstado = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Estado actualizado exitosamente',
-      data: mantenimiento
+      message: "Estado actualizado exitosamente",
+      data: mantenimiento,
     });
   } catch (error) {
-    console.error('Error al cambiar estado:', error);
+    console.error("Error al cambiar estado:", error);
 
-    if (error.kind === 'ObjectId') {
+    if (error.kind === "ObjectId") {
       return res.status(400).json({
         success: false,
-        message: 'ID de mantenimiento inválido'
+        message: "ID de mantenimiento inválido",
       });
     }
 
     res.status(500).json({
       success: false,
-      message: 'Error al cambiar estado',
-      error: error.message
+      message: "Error al cambiar estado",
+      error: error.message,
     });
   }
 };
@@ -292,7 +324,7 @@ exports.agregarNota = async (req, res) => {
     if (!descripcion || !autor) {
       return res.status(400).json({
         success: false,
-        message: 'La descripción y el autor son requeridos'
+        message: "La descripción y el autor son requeridos",
       });
     }
 
@@ -301,7 +333,7 @@ exports.agregarNota = async (req, res) => {
     if (!mantenimiento) {
       return res.status(404).json({
         success: false,
-        message: 'Mantenimiento no encontrado'
+        message: "Mantenimiento no encontrado",
       });
     }
 
@@ -309,15 +341,15 @@ exports.agregarNota = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Nota agregada exitosamente',
-      data: mantenimiento
+      message: "Nota agregada exitosamente",
+      data: mantenimiento,
     });
   } catch (error) {
-    console.error('Error al agregar nota:', error);
+    console.error("Error al agregar nota:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al agregar nota',
-      error: error.message
+      message: "Error al agregar nota",
+      error: error.message,
     });
   }
 };
@@ -330,37 +362,37 @@ exports.getEstadisticas = async (req, res) => {
     const porEstado = await Mantenimiento.aggregate([
       {
         $group: {
-          _id: '$estado',
-          cantidad: { $sum: 1 }
-        }
-      }
+          _id: "$estado",
+          cantidad: { $sum: 1 },
+        },
+      },
     ]);
 
     const porTipo = await Mantenimiento.aggregate([
       {
         $group: {
-          _id: '$tipo',
-          cantidad: { $sum: 1 }
-        }
-      }
+          _id: "$tipo",
+          cantidad: { $sum: 1 },
+        },
+      },
     ]);
 
     const porPrioridad = await Mantenimiento.aggregate([
       {
         $group: {
-          _id: '$prioridad',
-          cantidad: { $sum: 1 }
-        }
-      }
+          _id: "$prioridad",
+          cantidad: { $sum: 1 },
+        },
+      },
     ]);
 
     const costoTotal = await Mantenimiento.aggregate([
       {
         $group: {
           _id: null,
-          total: { $sum: '$costo' }
-        }
-      }
+          total: { $sum: "$costo" },
+        },
+      },
     ]);
 
     res.json({
@@ -370,15 +402,15 @@ exports.getEstadisticas = async (req, res) => {
         porEstado,
         porTipo,
         porPrioridad,
-        costoTotal: costoTotal[0]?.total || 0
-      }
+        costoTotal: costoTotal[0]?.total || 0,
+      },
     });
   } catch (error) {
-    console.error('Error al obtener estadísticas:', error);
+    console.error("Error al obtener estadísticas:", error);
     res.status(500).json({
       success: false,
-      message: 'Error al obtener estadísticas',
-      error: error.message
+      message: "Error al obtener estadísticas",
+      error: error.message,
     });
   }
 };
