@@ -1,379 +1,164 @@
-# Sistema de Gestión de Activos y Mantenimientos
+# 🏢 Sistema de Gestión de Activos y Mantenimientos
 
-Sistema de gestión de activos y mantenimientos basado en arquitectura de microservicios con Node.js, PostgreSQL, MongoDB, Next.js y Docker.
+Sistema de microservicios para la gestión integral de activos empresariales y sus mantenimientos, construido con arquitectura de microservicios, API Gateway y despliegue en Railway.
 
-## Arquitectura del Proyecto
+## 📋 Tabla de Contenidos
+
+- [Características](#-características)
+- [Arquitectura](#-arquitectura)
+- [Tecnologías](#-tecnologías)
+- [Requisitos Previos](#-requisitos-previos)
+- [Instalación y Configuración](#-instalación-y-configuración)
+- [Uso en Local](#-uso-en-local)
+- [Despliegue en Producción](#-despliegue-en-producción)
+- [CI/CD con Jenkins](#-cicd-con-jenkins)
+- [API Endpoints](#-api-endpoints)
+- [Testing](#-testing)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Troubleshooting](#-troubleshooting)
+
+---
+
+## ✨ Características
+
+### Gestión de Activos
+
+- ✅ CRUD completo de activos empresariales
+- 🔍 Búsqueda y filtrado avanzado
+- 📊 Estadísticas y reportes
+- 🏷️ Categorización (electrónico, maquinaria, vehículo, mobiliario, etc.)
+- 📍 Seguimiento de ubicación y estado
+
+### Gestión de Mantenimientos
+
+- 🔧 Registro de mantenimientos (preventivo, correctivo, predictivo, emergencia)
+- 👨‍🔧 Asignación de técnicos
+- 💰 Control de costos y piezas
+- 📝 Notas y historial de cambios
+- ⚡ Priorización (baja, media, alta, crítica)
+- 📅 Programación y seguimiento
+
+### Características Técnicas
+
+- 🚀 Arquitectura de microservicios
+- 🔄 API Gateway centralizado
+- 🐳 Dockerizado completamente
+- ⚙️ CI/CD con Jenkins
+- ☁️ Desplegado en Railway
+- 🧪 Tests automatizados
+- 📱 Frontend responsive con Next.js
+- 🔁 Despliegue continuo automatizado
+
+---
+
+## 🏗️ Arquitectura
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      Frontend (Next.js)                     │
-│                    Puerto: 3003                             │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    API Gateway (Express)                    │
-│                    Puerto: 3000                             │
-└──────────────┬─────────────────────────┬────────────────────┘
-               │                         │
-               ▼                         ▼
-┌──────────────────────────┐  ┌──────────────────────────┐
-│  Servicio de Activos     │  │ Servicio Mantenimientos  │
-│  (Express + PostgreSQL)  │  │  (Express + MongoDB)     │
-│  Puerto: 3001            │  │  Puerto: 3002            │
-└──────────┬───────────────┘  └───────────┬──────────────┘
-           │                              │
-           ▼                              ▼
-┌──────────────────────┐      ┌──────────────────────┐
-│   PostgreSQL 15      │      │      MongoDB 7       │
-│   Puerto: 5432       │      │   Puerto: 27017      │
-└──────────────────────┘      └──────────────────────┘
+┌─────────────┐
+│   Frontend  │ (Next.js)
+│  Port 3003  │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ API Gateway │ (Express)
+│  Port 3000  │
+└──────┬──────┘
+       │
+       ├──────────────┬──────────────┐
+       ▼              ▼              ▼
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│  Servicio   │ │  Servicio   │ │   Otros     │
+│   Activos   │ │Mantenimientos│ │  Servicios  │
+│  Port 3001  │ │  Port 3002  │ │             │
+└──────┬──────┘ └──────┬──────┘ └─────────────┘
+       │              │
+       ▼              ▼
+┌─────────────┐ ┌─────────────┐
+│ PostgreSQL  │ │   MongoDB   │
+│  Port 5432  │ │  Port 27017 │
+└─────────────┘ └─────────────┘
 ```
 
-## Componentes
+### Componentes
 
-### 1. **Servicio de Activos** (Node.js + Express + PostgreSQL)
-- Gestión de activos de la empresa
-- Base de datos relacional PostgreSQL
-- API RESTful con validaciones
-- Modelo: ID, nombre, descripción, número de serie, categoría, fecha de adquisición, costo, ubicación, estado
+1. **Frontend (Next.js)**: Interfaz de usuario responsive
+2. **API Gateway**: Punto de entrada único, enrutamiento y proxy
+3. **Servicio de Activos**: Gestión de activos con PostgreSQL
+4. **Servicio de Mantenimientos**: Gestión de mantenimientos con MongoDB
+5. **Bases de Datos**: PostgreSQL para activos, MongoDB para mantenimientos
 
-### 2. **Servicio de Mantenimientos** (Node.js + Express + MongoDB)
-- Gestión de mantenimientos y reparaciones
-- Base de datos NoSQL MongoDB con modelos flexibles
-- Subdocumentos: técnico, piezas, notas, historial
-- Arrays dinámicos para aprovechar características de MongoDB
+---
 
-### 3. **API Gateway** (Express)
-- Punto de entrada único para el frontend
-- Enrutamiento a microservicios
-- Rate limiting
-- Manejo centralizado de CORS
-
-### 4. **Frontend** (Next.js + Chakra UI)
-- Interfaz moderna con Next.js 14 (App Router)
-- Componentes de Chakra UI
-- Dashboard con estadísticas
-- CRUD completo para activos y mantenimientos
-- Diseño responsivo
-
-## Stack Tecnológico
+## 🛠️ Tecnologías
 
 ### Backend
-- **Node.js 20 LTS**
+
+- **Node.js** v18+
 - **Express.js** - Framework web
-- **PostgreSQL 15** - Base de datos relacional
-- **MongoDB 7** - Base de datos NoSQL
+- **PostgreSQL** - Base de datos relacional (Activos)
+- **MongoDB** - Base de datos NoSQL (Mantenimientos)
 - **Sequelize** - ORM para PostgreSQL
 - **Mongoose** - ODM para MongoDB
 
 ### Frontend
-- **Next.js 14** - Framework de React
-- **Chakra UI v2** - Librería de componentes
+
+- **Next.js** 14
+- **React** 18
 - **Axios** - Cliente HTTP
-- **React Hook Form** - Manejo de formularios
+- **Tailwind CSS** - Estilos
 
-### DevOps
-- **Docker** - Contenedores
-- **Docker Compose** - Orquestación
-- **Jenkins** - CI/CD (para implementar después)
+### DevOps & CI/CD
 
-### Testing
-- **Jest** - Framework de testing
-- **Supertest** - Testing de APIs
-- **MongoDB Memory Server** - MongoDB en memoria para tests
+- **Docker** & **Docker Compose** - Contenedorización
+- **Jenkins** - CI/CD Pipeline automatizado
+- **Railway** - Plataforma de despliegue cloud
+- **Jest** - Testing framework
+- **Supertest** - Testing de APIs REST
+- **GitHub Webhooks** - Integración continua
 
-## Requisitos Previos
+---
 
-- Node.js 20+
-- Docker y Docker Compose
-- Git
-- Make (opcional, para usar Makefile)
+## 📦 Requisitos Previos
 
-## Instalación y Configuración
+### Para desarrollo local:
 
-### 1. Clonar el Repositorio
+- **Node.js** v18 o superior
+- **Docker** y **Docker Compose**
+- **Git**
+- **npm** o **yarn**
+
+### Para despliegue en Railway:
+
+- Cuenta en [Railway](https://railway.app)
+- Git configurado
+- Repositorio en GitHub/GitLab
+
+---
+
+## 🚀 Instalación y Configuración
+
+### 1. Clonar el repositorio
 
 ```bash
 git clone <url-del-repositorio>
-cd proyecto-final-jenkins
+cd proyecto-fina-cloud-computing
 ```
 
-### 2. Opción A: Con Docker (Recomendado)
-
-#### Usando Docker Compose
+### 2. Instalar dependencias
 
 ```bash
-# Construir las imágenes
-docker-compose build
-
-# Iniciar todos los servicios
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f
+# Instalar dependencias de todos los servicios
+npm install --prefix api-gateway
+npm install --prefix servicio-activos
+npm install --prefix servicio-mantenimientos
+npm install --prefix frontend
 ```
 
-#### Usando Makefile
+### 3. Configurar variables de entorno
 
-```bash
-# Ver todos los comandos disponibles
-make help
+#### API Gateway (`.env`)
 
-# Construir e iniciar servicios
-make build
-make up
-
-# Ver logs
-make logs
-
-# Detener servicios
-make down
-```
-
-### 3. Opción B: Desarrollo Local
-
-#### Instalar Dependencias
-
-```bash
-# Servicio de Activos
-cd servicio-activos
-npm install
-
-# Servicio de Mantenimientos
-cd ../servicio-mantenimientos
-npm install
-
-# API Gateway
-cd ../api-gateway
-npm install
-
-# Frontend
-cd ../frontend
-npm install
-```
-
-#### Iniciar Bases de Datos con Docker
-
-```bash
-# PostgreSQL
-docker run -d \
-  --name postgres-activos \
-  -e POSTGRES_DB=activos_db \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres123 \
-  -p 5432:5432 \
-  postgres:15-alpine
-
-# MongoDB
-docker run -d \
-  --name mongodb-mantenimientos \
-  -p 27017:27017 \
-  mongo:7
-```
-
-#### Iniciar Servicios en Modo Desarrollo
-
-```bash
-# Terminal 1 - Servicio de Activos
-cd servicio-activos
-npm run dev
-
-# Terminal 2 - Servicio de Mantenimientos
-cd servicio-mantenimientos
-npm run dev
-
-# Terminal 3 - API Gateway
-cd api-gateway
-npm run dev
-
-# Terminal 4 - Frontend
-cd frontend
-npm run dev
-```
-
-## Acceso a los Servicios
-
-Una vez iniciados los servicios, puedes acceder a:
-
-- **Frontend**: http://localhost:3003
-- **API Gateway**: http://localhost:3000
-- **Servicio de Activos**: http://localhost:3001
-- **Servicio de Mantenimientos**: http://localhost:3002
-- **PostgreSQL**: localhost:5432
-- **MongoDB**: localhost:27017
-
-## Endpoints de la API
-
-### Servicio de Activos (vía Gateway: `/api/activos`)
-
-```
-GET    /api/activos                 - Listar activos (con paginación y filtros)
-GET    /api/activos/:id             - Obtener activo por ID
-GET    /api/activos/search?q=       - Buscar activos
-GET    /api/activos/estadisticas    - Obtener estadísticas
-POST   /api/activos                 - Crear activo
-PUT    /api/activos/:id             - Actualizar activo
-DELETE /api/activos/:id             - Eliminar activo
-```
-
-### Servicio de Mantenimientos (vía Gateway: `/api/mantenimientos`)
-
-```
-GET    /api/mantenimientos                    - Listar mantenimientos
-GET    /api/mantenimientos/:id                - Obtener mantenimiento por ID
-GET    /api/mantenimientos/activo/:activoId   - Mantenimientos de un activo
-GET    /api/mantenimientos/estadisticas       - Obtener estadísticas
-POST   /api/mantenimientos                    - Crear mantenimiento
-PUT    /api/mantenimientos/:id                - Actualizar mantenimiento
-PATCH  /api/mantenimientos/:id/estado         - Cambiar estado
-POST   /api/mantenimientos/:id/notas          - Agregar nota
-DELETE /api/mantenimientos/:id                - Eliminar mantenimiento
-```
-
-### Health Checks
-
-```
-GET /health - Estado del servicio individual
-GET /health/all - Estado de todos los servicios (solo en Gateway)
-```
-
-## Ejecutar Tests
-
-### Con Docker
-
-```bash
-# Tests del servicio de activos
-docker-compose exec servicio-activos npm test
-
-# Tests del servicio de mantenimientos
-docker-compose exec servicio-mantenimientos npm test
-```
-
-### Localmente
-
-```bash
-# Servicio de Activos
-cd servicio-activos
-npm test
-
-# Servicio de Mantenimientos
-cd servicio-mantenimientos
-npm test
-```
-
-### Con Makefile
-
-```bash
-make test           # Ejecutar todos los tests
-make test-activos   # Solo servicio de activos
-make test-mantenimientos  # Solo servicio de mantenimientos
-```
-
-## Estructura del Proyecto
-
-```
-proyecto-final-jenkins/
-├── servicio-activos/
-│   ├── src/
-│   │   ├── config/          # Configuración de DB
-│   │   ├── models/          # Modelos Sequelize
-│   │   ├── controllers/     # Controladores
-│   │   ├── routes/          # Rutas Express
-│   │   └── index.js         # Entrada principal
-│   ├── tests/               # Tests
-│   ├── Dockerfile
-│   └── package.json
-│
-├── servicio-mantenimientos/
-│   ├── src/
-│   │   ├── config/          # Configuración MongoDB
-│   │   ├── models/          # Schemas Mongoose
-│   │   ├── controllers/     # Controladores
-│   │   ├── routes/          # Rutas Express
-│   │   └── index.js         # Entrada principal
-│   ├── tests/               # Tests
-│   ├── Dockerfile
-│   └── package.json
-│
-├── api-gateway/
-│   ├── src/
-│   │   └── index.js         # Gateway con proxies
-│   ├── Dockerfile
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── app/             # Páginas (App Router)
-│   │   ├── components/      # Componentes React
-│   │   └── services/        # Servicios API
-│   ├── Dockerfile
-│   └── package.json
-│
-├── docker-compose.yml       # Orquestación
-├── Makefile                 # Comandos útiles
-├── .gitignore
-└── README.md
-```
-
-## Comandos Útiles con Docker Compose
-
-```bash
-# Iniciar servicios
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f
-
-# Logs de un servicio específico
-docker-compose logs -f servicio-activos
-
-# Ver estado
-docker-compose ps
-
-# Detener servicios
-docker-compose down
-
-# Detener y eliminar volúmenes
-docker-compose down -v
-
-# Reconstruir imágenes
-docker-compose build --no-cache
-
-# Reiniciar un servicio específico
-docker-compose restart servicio-activos
-
-# Acceder a shell de un contenedor
-docker-compose exec servicio-activos sh
-
-# Acceder a PostgreSQL
-docker-compose exec postgres psql -U postgres -d activos_db
-
-# Acceder a MongoDB
-docker-compose exec mongodb mongosh mantenimientos_db
-```
-
-## Variables de Entorno
-
-### Servicio de Activos
-```env
-PORT=3001
-NODE_ENV=development
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=activos_db
-DB_USER=postgres
-DB_PASSWORD=postgres123
-```
-
-### Servicio de Mantenimientos
-```env
-PORT=3002
-NODE_ENV=development
-MONGO_URI=mongodb://localhost:27017/mantenimientos_db
-```
-
-### API Gateway
 ```env
 PORT=3000
 NODE_ENV=development
@@ -381,82 +166,537 @@ ACTIVOS_SERVICE_URL=http://localhost:3001
 MANTENIMIENTOS_SERVICE_URL=http://localhost:3002
 ```
 
-### Frontend
+#### Servicio de Activos (`.env`)
+
+```env
+PORT=3001
+NODE_ENV=development
+DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/activos_db
+```
+
+#### Servicio de Mantenimientos (`.env`)
+
+```env
+PORT=3002
+NODE_ENV=development
+MONGO_URI=mongodb://mongodb:27017/mantenimientos_db
+```
+
+#### Frontend (`.env.local`)
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
 
-## Próximos Pasos - Jenkins CI/CD
+---
 
-Para implementar Jenkins (cuando lo solicites), se creará:
+## 💻 Uso en Local
 
-1. **Jenkinsfile** con pipeline declarativo
-2. **Stages**: Checkout → Install → Test → Build → Deploy
-3. Integración con Docker
-4. Notificaciones de build
-
-## Solución de Problemas
-
-### Error de conexión a PostgreSQL
+### Opción 1: Con Docker Compose (Recomendado)
 
 ```bash
-# Verificar que PostgreSQL esté corriendo
-docker-compose ps
-
-# Ver logs de PostgreSQL
-docker-compose logs postgres
-
-# Reiniciar PostgreSQL
-docker-compose restart postgres
-```
-
-### Error de conexión a MongoDB
-
-```bash
-# Verificar que MongoDB esté corriendo
-docker-compose ps
-
-# Ver logs de MongoDB
-docker-compose logs mongodb
-
-# Reiniciar MongoDB
-docker-compose restart mongodb
-```
-
-### Frontend no se conecta al API Gateway
-
-Verificar que `NEXT_PUBLIC_API_URL` esté configurado correctamente:
-
-```bash
-# En desarrollo local
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
-
-# En Docker
-NEXT_PUBLIC_API_URL=http://api-gateway:3000/api
-```
-
-### Limpiar y Reiniciar Todo
-
-```bash
-# Detener todo
-docker-compose down -v
-
-# Limpiar sistema Docker
-docker system prune -af
-
-# Reconstruir e iniciar
-docker-compose build --no-cache
+# Levantar todos los servicios
 docker-compose up -d
+
+# Ver logs
+docker-compose logs -f
+
+# Detener servicios
+docker-compose down
+
+# Reconstruir servicios
+docker-compose up -d --build
 ```
 
-## Contribuciones
+**URLs locales:**
 
-Este proyecto fue desarrollado como parcial académico para demostrar arquitectura de microservicios.
+- Frontend: http://localhost:3003
+- API Gateway: http://localhost:3000
+- Servicio Activos: http://localhost:3001
+- Servicio Mantenimientos: http://localhost:3002
 
-## Licencia
+### Opción 2: Sin Docker (Manual)
 
-ISC
+```bash
+# Terminal 1 - PostgreSQL (necesitas tenerlo instalado)
+# Crear base de datos: activos_db
 
-## Autor
+# Terminal 2 - MongoDB (necesitas tenerlo instalado)
+mongod
 
-Proyecto desarrollado para el parcial de arquitectura de microservicios.
+# Terminal 3 - API Gateway
+cd api-gateway
+npm run dev
+
+# Terminal 4 - Servicio Activos
+cd servicio-activos
+npm run dev
+
+# Terminal 5 - Servicio Mantenimientos
+cd servicio-mantenimientos
+npm run dev
+
+# Terminal 6 - Frontend
+cd frontend
+npm run dev
+```
+
+---
+
+## ☁️ Despliegue en Producción (Railway)
+
+### 1. Preparar el proyecto
+
+Asegúrate de que todos los cambios estén en Git:
+
+```bash
+git add .
+git commit -m "Preparar para despliegue"
+git push
+```
+
+### 2. Crear proyecto en Railway
+
+1. Ve a [Railway](https://railway.app)
+2. Crea un nuevo proyecto
+3. Conecta tu repositorio de GitHub
+
+### 3. Crear servicios
+
+Crea los siguientes servicios en Railway:
+
+#### A. Base de Datos PostgreSQL
+
+- Agregar servicio → PostgreSQL
+- Nombre: `postgres-production`
+- Copiar la `DATABASE_URL` generada
+
+#### B. Base de Datos MongoDB
+
+- Agregar servicio → MongoDB
+- Nombre: `mongodb-production`
+- Copiar la `MONGO_URI` generada
+
+#### C. Servicio de Activos
+
+- Agregar servicio → GitHub Repo
+- Root Directory: `servicio-activos`
+- Variables de entorno:
+  ```
+  NODE_ENV=production
+  PORT=3001
+  DATABASE_URL=<url-de-postgres>
+  ```
+
+#### D. Servicio de Mantenimientos
+
+- Agregar servicio → GitHub Repo
+- Root Directory: `servicio-mantenimientos`
+- Variables de entorno:
+  ```
+  NODE_ENV=production
+  PORT=3002
+  MONGO_URI=<url-de-mongodb>
+  ```
+
+#### E. API Gateway
+
+- Agregar servicio → GitHub Repo
+- Root Directory: `api-gateway`
+- Variables de entorno:
+  ```
+  NODE_ENV=production
+  PORT=3000
+  ACTIVOS_SERVICE_URL=https://servicio-activos-production.up.railway.app
+  MANTENIMIENTOS_SERVICE_URL=https://servicio-mantenimientos-production.up.railway.app
+  ```
+
+#### F. Frontend
+
+- Agregar servicio → GitHub Repo
+- Root Directory: `frontend`
+- Variables de entorno:
+  ```
+  NODE_ENV=production
+  NEXT_PUBLIC_API_URL=https://api-gateway-production-xxxx.up.railway.app/api
+  ```
+
+### 4. Configurar dominios públicos
+
+En cada servicio, ve a Settings → Networking → Generate Domain
+
+### 5. Actualizar URLs
+
+Actualiza las variables de entorno con las URLs públicas generadas.
+
+---
+
+## � CI/CD dcon Jenkins
+
+Este proyecto incluye integración continua y despliegue continuo (CI/CD) usando Jenkins.
+
+### Configuración de Jenkins
+
+#### 1. Levantar Jenkins con Docker
+
+```bash
+# Opción 1: Usar docker-compose (incluye Jenkins)
+docker-compose up -d jenkins
+
+# Opción 2: Levantar Jenkins standalone
+docker build -f jenkins.Dockerfile -t jenkins-custom .
+docker run -d -p 8080:8080 -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --name jenkins jenkins-custom
+```
+
+#### 2. Acceder a Jenkins
+
+1. Abrir http://localhost:8080
+2. Obtener la contraseña inicial:
+   ```bash
+   docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+   ```
+3. Instalar plugins recomendados
+4. Crear usuario administrador
+
+#### 3. Configurar Pipeline
+
+1. **Crear nuevo Job:**
+
+   - New Item → Pipeline
+   - Nombre: `proyecto-activos-pipeline`
+
+2. **Configurar SCM:**
+
+   - Pipeline → Definition: Pipeline script from SCM
+   - SCM: Git
+   - Repository URL: `<tu-repositorio>`
+   - Branch: `*/main`
+   - Script Path: `Jenkinsfile`
+
+3. **Configurar Webhooks (opcional):**
+   - En GitHub: Settings → Webhooks → Add webhook
+   - Payload URL: `http://tu-jenkins:8080/github-webhook/`
+   - Content type: `application/json`
+   - Events: Push events
+
+### Pipeline Stages
+
+El `Jenkinsfile` incluye las siguientes etapas:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Jenkins Pipeline                      │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  1. 📥 Checkout                                         │
+│     └─ Clonar código del repositorio                   │
+│                                                          │
+│  2. 🔍 Verificar Cambios                               │
+│     └─ Detectar qué servicios cambiaron                │
+│                                                          │
+│  3. 🧪 Tests                                            │
+│     ├─ Test Servicio Activos                           │
+│     └─ Test Servicio Mantenimientos                    │
+│                                                          │
+│  4. 🐳 Build Docker Images                             │
+│     ├─ Build API Gateway                               │
+│     ├─ Build Servicio Activos                          │
+│     ├─ Build Servicio Mantenimientos                   │
+│     └─ Build Frontend                                   │
+│                                                          │
+│  5. 🚀 Deploy                                           │
+│     └─ Desplegar servicios modificados                 │
+│                                                          │
+│  6. ✅ Verificación                                     │
+│     └─ Health checks de servicios                      │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Características del Pipeline
+
+- ✅ **Tests automáticos** antes de cada deploy
+- ✅ **Build condicional** - solo construye servicios modificados
+- ✅ **Despliegue automático** a Railway
+- ✅ **Health checks** post-despliegue
+- ✅ **Notificaciones** de estado del build
+- ✅ **Rollback automático** en caso de fallo
+
+### Variables de Entorno en Jenkins
+
+Configurar en Jenkins → Manage Jenkins → Configure System → Global properties:
+
+```
+RAILWAY_TOKEN=<tu-token-de-railway>
+DOCKER_REGISTRY=<tu-registry> (opcional)
+SLACK_WEBHOOK=<webhook-para-notificaciones> (opcional)
+```
+
+### Comandos Útiles
+
+```bash
+# Ver logs de Jenkins
+docker logs -f jenkins
+
+# Reiniciar Jenkins
+docker restart jenkins
+
+# Backup de Jenkins
+docker exec jenkins tar -czf /tmp/jenkins-backup.tar.gz /var/jenkins_home
+docker cp jenkins:/tmp/jenkins-backup.tar.gz ./jenkins-backup.tar.gz
+
+# Restaurar Jenkins
+docker cp ./jenkins-backup.tar.gz jenkins:/tmp/
+docker exec jenkins tar -xzf /tmp/jenkins-backup.tar.gz -C /
+```
+
+### Flujo de Trabajo CI/CD
+
+```
+Developer → Git Push → GitHub
+                         ↓
+                    Webhook
+                         ↓
+                     Jenkins
+                         ↓
+                  ┌──────┴──────┐
+                  ↓             ↓
+              Run Tests    Build Images
+                  ↓             ↓
+                  └──────┬──────┘
+                         ↓
+                    Deploy to Railway
+                         ↓
+                   Health Checks
+                         ↓
+                  ✅ Success / ❌ Rollback
+```
+
+### Documentación Adicional
+
+Para más detalles sobre la configuración de Jenkins:
+
+- Ver [JENKINS_SETUP.md](./JENKINS_SETUP.md) - Guía detallada de configuración
+- Ver [CI_CD_FLOW.md](./CI_CD_FLOW.md) - Flujo completo de CI/CD
+- Ver [Jenkinsfile](./Jenkinsfile) - Pipeline completo
+
+---
+
+## 📡 API Endpoints
+
+### Activos
+
+| Método | Endpoint                      | Descripción              |
+| ------ | ----------------------------- | ------------------------ |
+| GET    | `/api/activos/lista`          | Listar todos los activos |
+| GET    | `/api/activos/ver/:id`        | Obtener un activo por ID |
+| GET    | `/api/activos/buscar?q=`      | Buscar activos           |
+| GET    | `/api/activos/stats`          | Estadísticas de activos  |
+| POST   | `/api/activos/crear`          | Crear nuevo activo       |
+| PUT    | `/api/activos/actualizar/:id` | Actualizar activo        |
+| DELETE | `/api/activos/eliminar/:id`   | Eliminar activo          |
+
+### Mantenimientos
+
+| Método | Endpoint                                 | Descripción                     |
+| ------ | ---------------------------------------- | ------------------------------- |
+| GET    | `/api/mantenimientos/lista`              | Listar todos los mantenimientos |
+| GET    | `/api/mantenimientos/ver/:id`            | Obtener un mantenimiento        |
+| GET    | `/api/mantenimientos/por-activo/:id`     | Mantenimientos por activo       |
+| GET    | `/api/mantenimientos/stats`              | Estadísticas                    |
+| POST   | `/api/mantenimientos/crear`              | Crear mantenimiento             |
+| PUT    | `/api/mantenimientos/actualizar/:id`     | Actualizar mantenimiento        |
+| PATCH  | `/api/mantenimientos/cambiar-estado/:id` | Cambiar estado                  |
+| POST   | `/api/mantenimientos/agregar-nota/:id`   | Agregar nota                    |
+| DELETE | `/api/mantenimientos/eliminar/:id`       | Eliminar mantenimiento          |
+
+**Documentación completa:** Ver [API_ENDPOINTS.md](./API_ENDPOINTS.md)
+
+---
+
+## 🧪 Testing
+
+### Ejecutar tests
+
+```bash
+# Tests del servicio de activos
+cd servicio-activos
+npm test
+
+# Tests del servicio de mantenimientos
+cd servicio-mantenimientos
+npm test
+
+# Con Docker
+docker-compose run servicio-activos npm test
+docker-compose run servicio-mantenimientos npm test
+```
+
+### Coverage
+
+```bash
+npm test -- --coverage
+```
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+proyecto-fina-cloud-computing/
+├── api-gateway/                 # API Gateway
+│   ├── src/
+│   │   └── index.js            # Configuración del gateway
+│   ├── Dockerfile
+│   └── package.json
+│
+├── servicio-activos/           # Microservicio de Activos
+│   ├── src/
+│   │   ├── config/            # Configuración DB
+│   │   ├── controllers/       # Controladores
+│   │   ├── models/            # Modelos Sequelize
+│   │   ├── routes/            # Rutas
+│   │   └── index.js
+│   ├── tests/                 # Tests
+│   ├── Dockerfile
+│   └── package.json
+│
+├── servicio-mantenimientos/   # Microservicio de Mantenimientos
+│   ├── src/
+│   │   ├── config/            # Configuración DB
+│   │   ├── controllers/       # Controladores
+│   │   ├── models/            # Modelos Mongoose
+│   │   ├── routes/            # Rutas
+│   │   └── index.js
+│   ├── tests/                 # Tests
+│   ├── Dockerfile
+│   └── package.json
+│
+├── frontend/                   # Frontend Next.js
+│   ├── src/
+│   │   ├── app/               # App Router
+│   │   ├── components/        # Componentes React
+│   │   └── services/          # Servicios API
+│   ├── Dockerfile
+│   └── package.json
+│
+├── postgres-init/              # Scripts de inicialización PostgreSQL
+├── docker-compose.yml          # Orquestación local
+├── railway.toml               # Configuración Railway
+├── API_ENDPOINTS.md           # Documentación de API
+└── README.md                  # Este archivo
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Problema: Error de conexión a base de datos en local
+
+**Solución:**
+
+```bash
+# Verificar que los contenedores estén corriendo
+docker-compose ps
+
+# Reiniciar servicios
+docker-compose restart postgres mongodb
+```
+
+### Problema: Puerto ya en uso
+
+**Solución:**
+
+```bash
+# Windows
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+
+# Linux/Mac
+lsof -ti:3000 | xargs kill -9
+```
+
+### Problema: Error 301 en producción
+
+**Solución:**
+
+- Verificar que las URLs en Railway usen HTTPS
+- Verificar variables de entorno en Railway
+- Forzar redespliegue del servicio
+
+### Problema: Tests fallan
+
+**Solución:**
+
+```bash
+# Limpiar node_modules y reinstalar
+rm -rf node_modules package-lock.json
+npm install
+
+# Verificar que las bases de datos de test estén disponibles
+docker-compose up -d postgres mongodb
+```
+
+### Problema: Frontend no se conecta al backend
+
+**Solución:**
+
+- Verificar `NEXT_PUBLIC_API_URL` en `.env.local`
+- Verificar que el API Gateway esté corriendo
+- Revisar CORS en el API Gateway
+- Limpiar cache del navegador (Ctrl+Shift+R)
+
+---
+
+## 📝 Notas Adicionales
+
+### Desarrollo
+
+- Los cambios en el código se reflejan automáticamente con hot-reload
+- Los logs se pueden ver con `docker-compose logs -f <servicio>`
+- Para debugging, usa `console.log` o herramientas como Postman
+
+### Producción
+
+- Railway redespliegue automáticamente al hacer push a la rama principal
+- Los logs están disponibles en el dashboard de Railway
+- Las bases de datos en Railway tienen backups automáticos
+
+### Seguridad
+
+- Nunca commitear archivos `.env` con credenciales reales
+- Usar variables de entorno para configuración sensible
+- Implementar autenticación JWT (próxima feature)
+
+---
+
+## 👥 Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📄 Licencia
+
+Este proyecto es parte de un trabajo académico de Cloud Computing.
+
+---
+
+## 📞 Soporte
+
+Para problemas o preguntas:
+
+- Abrir un issue en GitHub
+- Revisar la documentación en [API_ENDPOINTS.md](./API_ENDPOINTS.md)
+- Consultar los logs de Railway o Docker
+
+---
+
+**¡Gracias por usar el Sistema de Gestión de Activos y Mantenimientos!** 🚀
