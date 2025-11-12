@@ -44,10 +44,8 @@ Sistema de microservicios para la gestión integral de activos empresariales y s
 - 🔄 API Gateway centralizado
 - 🐳 Dockerizado completamente
 - ⚙️ CI/CD con Jenkins
-- ☁️ Desplegado en Railway
-- 🧪 Tests automatizados
+- ☁️ Desplegado etizados
 - 📱 Frontend responsive con Next.js
-- 🔁 Despliegue continuo automatizado
 
 ---
 
@@ -475,13 +473,12 @@ Developer → Git Push → GitHub
                   ✅ Success / ❌ Rollback
 ```
 
-### Documentación Adicional
+### Notas sobre Jenkins
 
-Para más detalles sobre la configuración de Jenkins:
-
-- Ver [JENKINS_SETUP.md](./JENKINS_SETUP.md) - Guía detallada de configuración
-- Ver [CI_CD_FLOW.md](./CI_CD_FLOW.md) - Flujo completo de CI/CD
-- Ver [Jenkinsfile](./Jenkinsfile) - Pipeline completo
+- El archivo `Jenkinsfile` en la raíz del proyecto contiene la configuración completa del pipeline
+- Jenkins se ejecuta en el puerto 8080 por defecto
+- Los builds se ejecutan automáticamente al hacer push si los webhooks están configurados
+- Puedes ejecutar builds manualmente desde la interfaz de Jenkins
 
 ---
 
@@ -513,7 +510,7 @@ Para más detalles sobre la configuración de Jenkins:
 | POST   | `/api/mantenimientos/agregar-nota/:id`   | Agregar nota                    |
 | DELETE | `/api/mantenimientos/eliminar/:id`       | Eliminar mantenimiento          |
 
-**Documentación completa:** Ver [API_ENDPOINTS.md](./API_ENDPOINTS.md)
+**Nota:** Todos los endpoints requieren el prefijo `/api` cuando se accede a través del API Gateway.
 
 ---
 
@@ -694,8 +691,9 @@ Este proyecto es parte de un trabajo académico de Cloud Computing.
 Para problemas o preguntas:
 
 - Abrir un issue en GitHub
-- Revisar la documentación en [API_ENDPOINTS.md](./API_ENDPOINTS.md)
+- Revisar la sección de API Endpoints en este README
 - Consultar los logs de Railway o Docker
+- Revisar la sección de Troubleshooting
 
 ---
 
